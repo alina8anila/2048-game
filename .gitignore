@@ -1,0 +1,13 @@
+# TASM compiled files
+*.obj
+*.OBJ
+*.exe
+*.EXE
+*.com
+*.COM
+*.map
+*.MAP
+*.lst
+*.LST
+*.tr
+*.TR
