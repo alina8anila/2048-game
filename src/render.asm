@@ -18,7 +18,37 @@ print_line PROC
 ; вивести null-terminated рядок тексту за позицією
     push bp
     mov bp, sp
-    
+    push ax
+    push bx
+    push di
+    push si
+
+    ; [bp+10] - color attrbiute, [bp+8] - row, [bp+6] - column, [bp+4] - offset
+    ; DI = (row * 80 + column) * 2
+    mov ax, [bp+8]
+    mov bx, 80
+    mul bx
+    add ax, [bp+6]
+    shl ax, 1
+    mov di, ax
+    ; SI - offset
+    mov si, [bp+4]
+    ; AH - color attribute
+    mov ah, byte ptr [bp+10]
+
+    @print_loop:
+    lodsb
+    cmp al, 0
+    je @done
+    mov es:[di], ax
+    add di, 2
+    jmp @print_loop
+
+    @done:
+    pop si
+    pop di
+    pop bx
+    pop ax
     pop bp
     ret
     print_line ENDP
