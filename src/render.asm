@@ -23,7 +23,7 @@ print_line PROC
     push di
     push si
 
-    ; [bp+10] - color attrbiute, [bp+8] - row, [bp+6] - column, [bp+4] - offset
+    ; [bp+10] - color attribute, [bp+8] - row, [bp+6] - column, [bp+4] - offset
     ; DI = (row * 80 + column) * 2
     mov ax, [bp+8]
     mov bx, 80
