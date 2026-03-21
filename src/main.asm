@@ -3,6 +3,8 @@
 
 .DATA
     board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
+    TILE_WIDTH  EQU 7
+    TILE_HEIGHT EQU 3
     tile_colors DB 00h  ; чорний            пуста клітинка
                 DB 08h  ; темно-сірий       2¹=2
                 DB 07h  ; світло-сірий      2²=4
@@ -15,6 +17,7 @@
                 DB 03h  ; блакитний
                 DB 02h  ; зелений
                 DB 0Ah  ; яскраво-зелений   2¹¹=2048
+    buffer      DB 8 DUP(0)       ; для збереження рядка
     title       DB "2048$"
     hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
     hint_1      DB "Press C to continue, R to restart or ESC to quit$"
