@@ -14,7 +14,7 @@ tile_colors DB 00h
             DB 03h  ; блакитний
             DB 02h  ; зелений
             DB 0Ah  ; яскраво-зелений
-line        DB "2048", 0
+    line        DB "2048$"
 .CODE
 start:
     mov ax, @data

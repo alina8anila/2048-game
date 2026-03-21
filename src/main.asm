@@ -15,14 +15,14 @@
                 DB 03h  ; блакитний
                 DB 02h  ; зелений
                 DB 0Ah  ; яскраво-зелений   2¹¹=2048
-    title       DB "2048", 0
-    hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit", 0
-    hint_1      DB "Press C to continue, R to restart or ESC to quit", 0
-    hint_2      DB "Press R to restart or ESC to quit", 0
+    title       DB "2048$"
+    hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
+    hint_1      DB "Press C to continue, R to restart or ESC to quit$"
+    hint_2      DB "Press R to restart or ESC to quit$"
     hint_table  DW offset hint_0, offset hint_1, offset hint_2 ; таблиця повідомлень з підказками щодо клавіш
-    msg_0       DB "Join equal numbers and get to the 2048 tile!", 0
-    msg_1       DB "You've reached 2048!", 0
-    msg_2       DB "No more moves!", 0
+    msg_0       DB "Join equal numbers and get to the 2048 tile!$"
+    msg_1       DB "You've reached 2048!$"
+    msg_2       DB "No more moves!$"
     msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
     score       DW 0    ; current score
     best_score  DW 0    ; best score     

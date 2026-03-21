@@ -38,7 +38,7 @@ print_line PROC
 
     @print_loop:
     lodsb
-    cmp al, 0
+    cmp al, '$'
     je @done
     mov es:[di], ax
     add di, 2
