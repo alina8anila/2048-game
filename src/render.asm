@@ -57,11 +57,117 @@ draw_tile PROC ; КТ-3
 ; намалювати одну клітинку з її значенням
     push bp
     mov bp, sp
+    push ax
+    push bx
+    push cx
+    push si
+    push di
+    push dx
 
-    ; отримати позицію клітинки
-    ; визначити позицію її значення та колір
-    ; використовує num_to_str
+    ; [bp+6] - grid_row, [bp+4] - grid_column
+    ; обчислити index для взяття значення: row*4+column
+    mov ax, [bp+6]
+    mov bx, 4
+    mul bx
+    add ax, [bp+4]
+    mov di, ax    
+        ; зберігаємо index
+        mov cx, di
+    mov al, board[di]
+    xor ah, ah   
+    mov si, ax     ; si - power of 2
 
+    ; row = 5 + (tile_height+1) * grid_row,   column = 23 + (tile_width+1) * grid_column 
+    ; з відступами від країв та місцями для рамки МІЖ клітинками
+    mov ax, [bp+4]
+    mov di, TILE_WIDTH
+    inc di
+    mul di
+    add ax, 23
+    mov bx, ax      ; bx - column
+    mov ax, [bp+6]
+    mov di, TILE_HEIGHT 
+    inc di
+    mul di          
+    add ax, 5       ; ax - row
+
+        ; зберегти колонку, рядок та index
+        push bx
+        push ax
+        push cx
+
+    ; намалювати прямокутник
+    mov cx, TILE_HEIGHT
+    @row_loop:
+    push cx
+    push bx
+    push ax
+    mov cx, TILE_WIDTH
+    ; (row*80+column)*2
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+        @col_loop:
+        mov ah, tile_colors[si] ; колір
+        mov al, 219             ; символ
+        mov es:[di], ax
+
+        add di, 2
+        loop @col_loop
+    pop ax
+    pop bx
+    inc ax
+    pop cx
+    loop @row_loop
+
+        ; повернути збережений index
+        pop di
+    xor cx, cx
+    mov cl, board[di]
+    cmp cx, 0
+    jne @continue
+    add sp, 4       ; прибрати зайві значення ax та bx
+    jmp @done_drawing
+    @continue:
+    mov bx, 1
+    shl bx, cl         ; множення на 2 (піднесення в степінь)
+
+    push bx             ; значення плитки
+    call num_to_str     ; рядок у buffer, довжина у cx
+    add sp, 2
+
+    ; padding = (cell_width - string_length) / 2
+    mov ax, TILE_WIDTH
+    sub ax, cx
+    shr ax, 1
+    mov cx, ax
+
+        ; повернути збережені рядок та колонку
+        pop ax
+        pop bx
+
+    inc ax
+    add bx, cx          ; add padding
+
+    xor dx, dx
+    mov dl, tile_colors[si]
+    shl dx, 4
+    push dx
+    push ax
+    push bx
+    push offset buffer
+    call print_line
+    add sp, 8
+    
+    @done_drawing:
+    pop dx
+    pop di
+    pop si
+    pop cx
+    pop bx
+    pop ax
     pop bp
     ret
     draw_tile ENDP
