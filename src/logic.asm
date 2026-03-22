@@ -44,7 +44,6 @@ compress_row PROC ; КТ-3
     pop di
     pop si
     pop bx
-
     pop bp
     ret
     compress_row ENDP
@@ -53,11 +52,33 @@ merge_row PROC ; КТ-3
 ; злиття сусідніх рівних (для slide_left)
     push bp
     mov bp, sp
+    push bx
+    push si
+    push ax
     
-    ; пройти зліва направо
-    ; якщо два сусідніх елементи рівні то подвоїти лівий
-    ; обнулити правий
+    mov si, [bp+4]   ;board offset
+    mov bx, si
+    add bx, 3        ;bx-end, 3 because we have to be able to get to [si+1]
 
+    formerge:
+        cmp [si], byte ptr 0
+        je inc_si_merge    ;if([si]==0) inc_si_merge
+        mov al, [si]
+        cmp al, [si+1]
+        je merge_2blocks   ;if([si]==[si+1]) merge_2blocks
+        jmp inc_si_merge   ;else inc_si_merge
+        
+        merge_2blocks:
+            inc byte ptr [si]      ;left++
+            mov [si+1], byte ptr 0 ;right=0
+            inc si
+        inc_si_merge:
+            inc si
+            cmp si, bx
+            jl formerge   ;if(si<bx) formerge 
+    pop ax
+    pop si
+    pop bx
     pop bp
     ret
     merge_row ENDP
