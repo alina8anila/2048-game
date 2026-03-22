@@ -7,9 +7,35 @@ compress_row PROC ; КТ-3
     push bp
     mov bp, sp
     
-    ; зсунути всі ненульові значення на початок
-    ; заповнити решту нулями
+    mov si, [bp+4]   ;board offset
+    mov bx, si
+    add bx, 4        ;bx-end
 
+    go_si:
+        cmp [si], byte ptr 0
+        jne inc_si   ;if([si]!=0) inc_si
+
+        mov di, si   ;di-second pointer
+        find_not0:
+            inc di
+            cmp di, bx
+            je endgo_si   ;if([dx]==bx(end)) endgo_si
+
+            cmp byte ptr [di], 0
+            jne set_num   ;if([dx]!=0) set_num
+            jmp find_not0 ;else find_not0
+
+        set_num:
+            mov al, [di]
+            mov [si], al
+            mov byte ptr [di], 0
+
+        inc_si:
+            inc si
+            cmp si, bx 
+            jne go_si  ;while([si]!=bx(end))
+    
+    endgo_si:
     pop bp
     ret
     compress_row ENDP
