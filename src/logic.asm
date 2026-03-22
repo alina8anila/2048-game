@@ -6,6 +6,10 @@ compress_row PROC ; КТ-3
 ; збір ненульових плиток (для slide_left)
     push bp
     mov bp, sp
+    push bx
+    push si
+    push di
+    push ax
     
     mov si, [bp+4]   ;board offset
     mov bx, si
@@ -36,6 +40,11 @@ compress_row PROC ; КТ-3
             jne go_si  ;while([si]!=bx(end))
     
     endgo_si:
+    pop ax
+    pop di
+    pop si
+    pop bx
+
     pop bp
     ret
     compress_row ENDP
