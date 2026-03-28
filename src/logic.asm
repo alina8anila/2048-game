@@ -89,22 +89,22 @@ slide_left PROC ; КТ-4
     push cx
     push bx
     push ax
-    
+
     mov bx, offset board
     mov si, offset row
     mov cx, 4
-    for_sl:
+    @@for_sl:
         ;set row from board
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
         mov cx, 4
-        set_row:
+        @@set_row:
             mov al, [bx]
             mov [si], al
             inc si
             inc bx
-        loop set_row
+        loop @@set_row
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
         pop cx  ;restore cx for for_sl
@@ -120,18 +120,18 @@ slide_left PROC ; КТ-4
         push si ;save offset of row
         push bx ;save offset of board 
         mov cx, 4
-        set_board:
+        @@set_board:
         mov al, [si]
             mov [bx], al
             inc si
             inc bx
-        loop set_board
+        loop @@set_board
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
         pop cx  ;restore cx for for_sl
     
         add bx, 4 ;go to next row in board
-    loop for_sl
+    loop @@for_sl
 
     pop ax
     pop bx
@@ -142,12 +142,60 @@ slide_left PROC ; КТ-4
 
 slide_right PROC ; КТ-4
 ; зсув праворуч
-    push bp
-    mov bp, sp
+    push si
+    push cx
+    push bx
+    push ax
     
-    ; адаптувати під slide_left
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        add bx, 3 ;bx-end of row in board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            dec bx
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        add bx, 3 ;bx-end of row in board
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            dec bx
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        add bx, 4 ;go to next row in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_right ENDP
 
