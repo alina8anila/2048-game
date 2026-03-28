@@ -3,10 +3,10 @@
 locals @@
 
 .DATA
-    board   DB 1, 3, 0, 2
+    board   DB 1, 3, 2, 2
             DB 0, 3, 0, 1
-            DB 0, 1, 0, 1
-            DB 1, 3, 2, 2
+            DB 3, 1, 0, 1
+            DB 1, 3, 2, 1
     
     row  db 1, 0, 1, 2
 
@@ -15,7 +15,7 @@ start:
     mov ax, @data
     mov ds, ax
 
-    call slide_up
+    call slide_down
 
     push offset board
     call print
