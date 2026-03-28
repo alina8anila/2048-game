@@ -85,15 +85,58 @@ merge_row PROC ; КТ-3
 
 slide_left PROC ; КТ-4
 ; зсув ліворуч (Підхід A)
-    push bp
-    mov bp, sp
+    push si
+    push cx
+    push bx
+    push ax
     
-    ; для 4 рядків викликати:
-    ;  1. compress_row
-    ;  2. merge_row
-    ;  3. compress_row
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        mov cx, 4
+        set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            inc bx
+        loop set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        mov cx, 4
+        set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            inc bx
+        loop set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        add bx, 4 ;go to next row in board
+    loop for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_left ENDP
 
