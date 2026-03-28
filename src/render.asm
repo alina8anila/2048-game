@@ -235,9 +235,70 @@ draw_score PROC ; КТ-4
 ; вивести поточний і найкращий рахунок (порівняння best та current)
     push bp
     mov bp, sp
+    push ax
+    push bx
+    push cx
 
-    ; використовує num_to_str та print_line
+    ; заповнити рядок синім кольором
+    xor di, di
+    @next:
+    mov ah, 01h
+    mov al, 219
+    mov es:[di], ax
+    cmp di, 158
+    je @done_filling
+    add di, 2
+    jmp @next
 
+    @done_filling:
+    ; оновлення curr_score
+    mov ax, curr_score
+    push ax
+    call num_to_str
+    add sp, 2
+
+    push 1Fh
+    push 0
+    push 1
+    push offset curr_msg
+    call print_line
+    add sp, 8
+
+    push 1Fh
+    push 0
+    push CURR_LEN+1
+    push offset buffer
+    call print_line
+    add sp, 8
+
+    ; оновлення best_score
+    mov ax, best_score
+    push ax
+    call num_to_str
+    add sp, 2
+
+    mov bx, 79
+    sub bx, cx
+    sub bx, BEST_LEN
+
+    push 1Fh
+    push 0
+    push bx
+    push offset best_msg
+    call print_line
+    add sp, 8
+
+    add bx, BEST_LEN
+    push 1Fh
+    push 0
+    push bx
+    push offset buffer
+    call print_line
+    add sp, 8
+
+    pop cx
+    pop bx
+    pop ax
     pop bp
     ret
     draw_score ENDP
