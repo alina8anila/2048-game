@@ -27,7 +27,7 @@
     msg_1       DB "You've reached 2048!$"
     msg_2       DB "No more moves!$"
     msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
-    score       DW 0    ; current score
+    curr_score  DW 0    ; current score
     best_score  DW 0    ; best score     
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
 
