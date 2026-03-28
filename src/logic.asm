@@ -201,12 +201,58 @@ slide_right PROC ; КТ-4
 
 slide_up PROC ; КТ-4
 ; зсув вверх
-    push bp
-    mov bp, sp
+    push si
+    push cx
+    push bx
+    push ax
     
-    ; адаптувати під slide_left
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            add bx, 4 ;jump to next row in board
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            add bx, 4 ;jump to next row in board
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        inc bx  ;go to next column in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_up ENDP
 
