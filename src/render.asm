@@ -6,10 +6,244 @@ draw_board PROC ; КТ-4
 ; намалювати ігрове поле (рамку)
     push bp
     mov bp, sp
+    push di
+    push dx
+    push ax
+    push bx
+    push cx
     
     ; очищення екрану
-    ; вивести рамку
+    xor di, di
+    mov cx, 80 * 25
+    mov ax, 0720h  
+    @cls:
+    mov es:[di], ax
+    add di, 2
+    loop @cls
 
+    ; вивести рамку
+    ; з draw_tile: row = 5 + (tile_height+1) * grid_row,   column = 25 + (tile_width+1) * grid_column 
+    ; Верхня границя рамки: (4, 24) - кут
+    ; Нижня границя рамки: (4+4*(TILE_HEIGHT+1), 24+4*(TILE_WIDTH+1))
+
+    ; зовнішня рамка
+    ; ASCII: ║ 186, ═ 205, ╟ 199, ╢ 182, ╧ 207, ╤ 209, ╔ 201, ╗ 187, ╚ 200, ╝ 188
+    ; внутрішня рамка 
+    ; ASCII: │ 179, ─ 196, ┼ 197
+
+    ; ------- горизонтальні лінії -------
+    ; скільки стовпців треба пройти (без кутових)
+    
+    mov cx, TILE_WIDTH
+    inc cx
+    shl cx, 2
+    dec cx
+
+    mov bx, 25
+    horizontal:
+    push cx
+    ; DI = (row * 80 + column) * 2
+    ; column % (WIDTH + 1) == 0 - на межі з клітинкою
+    mov ax, 4   ; row
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    push di
+
+    mov ax, bx
+    xor dx, dx
+    mov dl, TILE_WIDTH
+    inc dl
+    div dl  ; ah - остача
+    cmp ah, 0
+    je @on_hor_boundary
+
+    mov ah, 0Fh
+    mov al, 205     ; ═ 205
+    mov es:[di], ax
+
+    mov ax, 80
+    mov dl, TILE_HEIGHT
+    inc dl
+    mul dl 
+    shl ax, 1
+    mov dx, ax  ; offset по рядкам
+    add di, dx  ; перейти до наступного горизонтального рядка
+    
+    mov cx, 3
+        @single_hor:
+        mov ah, 0Fh
+        mov al, 196     ; ─ 196
+        mov es:[di], ax
+
+        add di, dx
+        loop @single_hor
+
+    mov ah, 0Fh
+    mov al, 205     ; ═ 205
+    mov es:[di], ax
+    jmp @next_column
+
+    @on_hor_boundary:
+    mov ah, 0Fh
+    mov al, 209     ; ╤ 209
+    mov es:[di], ax
+
+    mov ax, 80
+    mov dl, TILE_HEIGHT
+    inc dl
+    mul dl 
+    shl ax, 1
+    mov dx, ax  ; offset по рядкам
+    add di, dx  ; перейти до наступного горизонтального рядка
+    
+    mov cx, 3
+        @single_lines_b:
+        mov ah, 0Fh
+        mov al, 197     ; ┼ 197
+        mov es:[di], ax
+
+        add di, dx
+        loop @single_lines_b
+
+    mov ah, 0Fh
+    mov al, 207     ; ╧ 207
+    mov es:[di], ax
+
+    @next_column:
+    pop di
+    add di, 2
+
+    inc bx
+    pop cx
+    loop horizontal
+
+    ; ------- вертикальні лінії -------
+    ; скільки рядків треба пройти (без кутових)
+    mov cx, TILE_HEIGHT
+    inc cx
+    shl cx, 2
+    dec cx
+
+    mov si, 5       ; рядок 5
+    vertical:
+    push cx
+    ; DI = (row * 80 + column) * 2
+    ; row % (HEIGHT + 1) == 0 - на межі з клітинкою
+    mov ax, si
+    mov dx, 80
+    mul dx
+    add ax, 24
+    shl ax, 1
+    mov di, ax
+    push di
+
+    mov ax, si
+    xor dx, dx
+    mov dl, TILE_HEIGHT
+    inc dl
+    div dl  ; ah - остача
+    cmp ah, 0
+    je @on_vert_boundary
+
+    mov ah, 0Fh
+    mov al, 186     ; ║ 186
+    mov es:[di], ax
+
+    mov dx, TILE_WIDTH
+    inc dx      
+    shl dx, 1   ; offset по стовпцям
+    add di, dx  ; перейти до наступної вертикалі 
+    
+    mov cx, 3
+        @single_vert:
+        mov ah, 0Fh
+        mov al, 179     ; │ 179
+        mov es:[di], ax
+
+        add di, dx
+        loop @single_vert
+
+    mov ah, 0Fh
+    mov al, 186     ; ║ 186
+    mov es:[di], ax
+    jmp @next_row
+
+    @on_vert_boundary:
+    mov ah, 0Fh
+    mov al, 199     ; ╟ 199
+    mov es:[di], ax
+
+    mov ax, TILE_WIDTH
+    inc ax
+    mov dx, 4
+    mul dx
+    shl ax, 1
+    mov dx, ax  ; offset по рядкам
+    add di, dx  ; перейти до найправішох вертикалі
+
+    mov ah, 0Fh
+    mov al, 182     ; ╢ 182
+    mov es:[di], ax
+
+    @next_row:
+    pop di
+    add di, 2
+
+    inc si
+    pop cx
+    loop vertical
+
+    ; ------- кути -------
+    mov ax, 4
+    mov dx, 80
+    mul dx
+    add ax, 24
+    shl ax, 1
+    mov di, ax
+    push di
+
+    mov ah, 0Fh
+    mov al, 201     ; ╔ 201
+    mov es:[di], ax
+
+    mov ax, TILE_WIDTH
+    inc ax
+    shl ax, 2
+    shl ax, 1
+    mov cx, ax  ; крок крайніми стовпцями рамки
+    add di, cx
+    
+    mov ah, 0Fh
+    mov al, 187     ; ╗ 187
+    mov es:[di], ax
+
+    pop di
+    mov ax, TILE_HEIGHT
+    inc ax
+    shl ax, 2
+    mov bx, 80
+    mul bx
+    shl ax, 1
+    add di, ax
+
+    mov ah, 0Fh
+    mov al, 200     ; ╚ 200
+    mov es:[di], ax
+
+    add di, cx
+
+    mov ah, 0Fh
+    mov al, 188     ; ╝ 188
+    mov es:[di], ax
+
+    pop cx
+    pop bx
+    pop ax
+    pop dx
+    pop di
     pop bp
     ret
     draw_board ENDP
@@ -77,13 +311,13 @@ draw_tile PROC ; КТ-3
     xor ah, ah   
     mov si, ax     ; si - power of 2
 
-    ; row = 5 + (tile_height+1) * grid_row,   column = 23 + (tile_width+1) * grid_column 
+    ; row = 5 + (tile_height+1) * grid_row,   column = 25 + (tile_width+1) * grid_column 
     ; з відступами від країв та місцями для рамки МІЖ клітинками
     mov ax, [bp+4]
     mov di, TILE_WIDTH
     inc di
     mul di
-    add ax, 23
+    add ax, 25
     mov bx, ax      ; bx - column
     mov ax, [bp+6]
     mov di, TILE_HEIGHT 
