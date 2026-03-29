@@ -85,64 +85,322 @@ merge_row PROC ; КТ-3
 
 slide_left PROC ; КТ-4
 ; зсув ліворуч (Підхід A)
-    push bp
-    mov bp, sp
-    
-    ; для 4 рядків викликати:
-    ;  1. compress_row
-    ;  2. merge_row
-    ;  3. compress_row
+    push si
+    push cx
+    push bx
+    push ax
 
-    pop bp
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            inc bx
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            inc bx
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        add bx, 4 ;go to next row in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_left ENDP
 
 slide_right PROC ; КТ-4
 ; зсув праворуч
-    push bp
-    mov bp, sp
+    push si
+    push cx
+    push bx
+    push ax
     
-    ; адаптувати під slide_left
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        add bx, 3 ;bx-end of row in board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            dec bx
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        add bx, 3 ;bx-end of row in board
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            dec bx
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        add bx, 4 ;go to next row in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_right ENDP
 
 slide_up PROC ; КТ-4
 ; зсув вверх
-    push bp
-    mov bp, sp
+    push si
+    push cx
+    push bx
+    push ax
     
-    ; адаптувати під slide_left
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            add bx, 4 ;jump to next row in board
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board 
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            add bx, 4 ;jump to next row in board
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        inc bx  ;go to next column in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_up ENDP
 
 slide_down PROC ; КТ-4
-; намалювати ігрове поле (рамку)
-    push bp
-    mov bp, sp
+push si
+    push cx
+    push bx
+    push ax
     
-    ; адаптувати під slide_left
+    mov bx, offset board
+    mov si, offset row
+    mov cx, 4
+    @@for_sl:
+        ;set row from board
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        add bx, 12 ;go to last row on board
+        mov cx, 4
+        @@set_row:
+            mov al, [bx]
+            mov [si], al
+            inc si
+            sub bx, 4 ;jump to next row in board
+        loop @@set_row
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
 
-    pop bp
+        push si
+        call compress_row
+        call merge_row
+        call compress_row
+        add sp, 2
+
+        ;set board from row
+        push cx ;save cx for for_sl
+        push si ;save offset of row
+        push bx ;save offset of board
+        add bx, 12 ;go to last row on board
+        mov cx, 4
+        @@set_board:
+        mov al, [si]
+            mov [bx], al
+            inc si
+            sub bx, 4 ;jump to next row in board
+        loop @@set_board
+        pop bx  ;restore offset of board
+        pop si  ;restore offset of row
+        pop cx  ;restore cx for for_sl
+    
+        inc bx  ;go to next column in board
+    loop @@for_sl
+
+    pop ax
+    pop bx
+    pop cx
+    pop si
     ret
     slide_down ENDP
 
 spawn_tile PROC ; КТ-4
 ; в рандомному пустому місці ставить плитку 2 або 4
-    push bp
-    mov bp, sp
-    
-    ; порахувати кількість пустих клітинок (n)
-    ; визначити з PRNG число від 0 до n-1 (відповідає одній з наявних пустих клітинок)
-    ; визначити з PRNG число 2 (90%) або 4 (10%)
-    ; записати у відповідну комірку відповідне число
+    push cx
+    push bx
+    push si
+    push dx
+    push ax
 
-    pop bp
+    xor bx, bx
+    mov cx, 16
+    mov si, offset board
+
+    push si ;save offset of board
+    for_count0:
+        cmp [si], byte ptr 0
+        jne @@skip
+        inc bx
+        @@skip:
+        inc si
+        loop for_count0
+    pop si ;restore offset of board
+    
+    push bx
+    call random_range 
+    add sp, 2
+    mov bx, ax      ;bx=випадкове число 0..bx-1
+
+    mov ax, 10
+    push ax
+    call random_range ;ax=випадкове число 0..9
+    add sp, 2
+
+    cmp ax, 0
+    je set_ax2
+    mov ax, 1
+    jmp notset_ax2
+    set_ax2:
+    mov ax, 2
+    notset_ax2:
+
+    inc bx
+    mov cx, 16
+    for_count02:
+        cmp [si], byte ptr 0
+        jne @@skip2
+        dec bx
+        jz set_al_to_board
+        @@skip2:
+        inc si
+        loop for_count02
+    set_al_to_board:
+    mov [si], al
+    
+    pop ax
+    pop dx
+    pop si
+    pop bx
+    pop cx
     ret
     spawn_tile ENDP
+
+random_range PROC
+    push bp
+    mov bp, sp
+    push bx
+    push cx
+    push dx
+    
+    mov ah, 00h ; Отримуємо число з системного таймера (кількість тіків)
+    int 1ah             ; cx:dx = кількість тіків з опівночі
+    ; seed = (seed * 25173 + 13849) AND FFFFh
+    mov ax, dx          ; dx-початкове seed
+    mov cx, 25173
+    mul cx              ; ax=seed*25173
+    add ax, 13849       ; ax=seed*25173+13849
+    
+    mov bx, [bp+4]      ; діапазон
+    xor dx, dx          
+    div bx              ; ax/bx, остача в dx
+    mov ax, dx          ; ax=випадкове число 0..bx-1
+    
+    pop dx
+    pop cx
+    pop bx
+    pop bp
+    ret
+    random_range ENDP
 
 check_game_over PROC ; КТ-5
 ; перевірка сусідніх рівних плиток

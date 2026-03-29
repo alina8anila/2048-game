@@ -1,7 +1,9 @@
 .MODEL small
 .STACK 100h
+locals @@
 
 .DATA
+    row         DB 0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
     board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3

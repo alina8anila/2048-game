@@ -1,38 +1,55 @@
 .MODEL small
 .STACK 100h
+locals @@
 
 .DATA
-    board   DB 1, 1, 0, 2
-            DB 0, 1, 0, 1
-            DB 1, 1, 1, 1
-            DB 0, 3, 2, 2
+    board   DB 3, 0, 3, 3 
+            DB 3, 3, 3, 3
+            DB 3, 3, 3, 3
+            DB 0, 3, 3, 0
+    
+    row  db 1, 0, 1, 2
 
 .CODE
 start:
     mov ax, @data
     mov ds, ax
 
-    mov bx, offset board
-    mov cx, 4
-    forr:
-        push bx
-        call compress_row
-        add sp, 2
+    call spawn_tile
 
-        push bx
-        call merge_row
-        add sp, 2
+    push offset board
+    call print
+    add sp, 2
+    ;mov ah, 02h
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-        push bx
-        call compress_row
-        add sp, 2
+    ;call slide_left
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-        push bx
-        call print
-        add sp, 2
+    ;call slide_right
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-        add bx, 4
-    loop forr
+    ;call slide_up
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
+
+    ;call slide_down
+    ;push offset board
+    ;call print
+    ;add sp, 2
+
 
     mov ah, 4Ch
     int 21h
@@ -46,7 +63,7 @@ start:
         push dx
     
         mov si, [bp+4] ;offset of the board
-        mov cx, 1
+        mov cx, 4
 
         mov ah, 02h
         for:
