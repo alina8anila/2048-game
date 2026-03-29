@@ -316,17 +316,91 @@ push si
 
 spawn_tile PROC ; КТ-4
 ; в рандомному пустому місці ставить плитку 2 або 4
-    push bp
-    mov bp, sp
-    
-    ; порахувати кількість пустих клітинок (n)
-    ; визначити з PRNG число від 0 до n-1 (відповідає одній з наявних пустих клітинок)
-    ; визначити з PRNG число 2 (90%) або 4 (10%)
-    ; записати у відповідну комірку відповідне число
+    push cx
+    push bx
+    push si
+    push dx
+    push ax
 
-    pop bp
+    xor bx, bx
+    mov cx, 16
+    mov si, offset board
+
+    push si ;save offset of board
+    for_count0:
+        cmp [si], byte ptr 0
+        jne @@skip
+        inc bx
+        @@skip:
+        inc si
+        loop for_count0
+    pop si ;restore offset of board
+    
+    push bx
+    call random_range 
+    add sp, 2
+    mov bx, ax      ;bx=випадкове число 0..bx-1
+
+    mov ax, 10
+    push ax
+    call random_range ;ax=випадкове число 0..9
+    add sp, 2
+
+    cmp ax, 0
+    je set_ax2
+    mov ax, 1
+    jmp notset_ax2
+    set_ax2:
+    mov ax, 2
+    notset_ax2:
+
+    inc bx
+    mov cx, 16
+    for_count02:
+        cmp [si], byte ptr 0
+        jne @@skip2
+        dec bx
+        jz set_al_to_board
+        @@skip2:
+        inc si
+        loop for_count02
+    set_al_to_board:
+    mov [si], al
+    
+    pop ax
+    pop dx
+    pop si
+    pop bx
+    pop cx
     ret
     spawn_tile ENDP
+
+random_range PROC
+    push bp
+    mov bp, sp
+    push bx
+    push cx
+    push dx
+    
+    mov ah, 00h ; Отримуємо число з системного таймера (кількість тіків)
+    int 1ah             ; cx:dx = кількість тіків з опівночі
+    ; seed = (seed * 25173 + 13849) AND FFFFh
+    mov ax, dx          ; dx-початкове seed
+    mov cx, 25173
+    mul cx              ; ax=seed*25173
+    add ax, 13849       ; ax=seed*25173+13849
+    
+    mov bx, [bp+4]      ; діапазон
+    xor dx, dx          
+    div bx              ; ax/bx, остача в dx
+    mov ax, dx          ; ax=випадкове число 0..bx-1
+    
+    pop dx
+    pop cx
+    pop bx
+    pop bp
+    ret
+    random_range ENDP
 
 check_game_over PROC ; КТ-5
 ; перевірка сусідніх рівних плиток

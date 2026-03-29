@@ -3,10 +3,10 @@
 locals @@
 
 .DATA
-    board   DB 1, 1, 2, 2
-            DB 1, 1, 1, 1
-            DB 2, 1, 0, 0
-            DB 2, 1, 0, 3
+    board   DB 3, 0, 3, 3 
+            DB 3, 3, 3, 3
+            DB 3, 3, 3, 3
+            DB 0, 3, 3, 0
     
     row  db 1, 0, 1, 2
 
@@ -15,38 +15,41 @@ start:
     mov ax, @data
     mov ds, ax
 
-    push offset board
-    call print
-    add sp, 2
-    mov ah, 02h
-    mov dl, 10      ; Line Feed
-    int 21h
+    call spawn_tile
 
-    call slide_left
     push offset board
     call print
     add sp, 2
-    mov dl, 10      ; Line Feed
-    int 21h
+    ;mov ah, 02h
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-    call slide_right
-    push offset board
-    call print
-    add sp, 2
-    mov dl, 10      ; Line Feed
-    int 21h
+    ;call slide_left
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-    call slide_up
-    push offset board
-    call print
-    add sp, 2
-    mov dl, 10      ; Line Feed
-    int 21h
+    ;call slide_right
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
 
-    call slide_down
-    push offset board
-    call print
-    add sp, 2
+    ;call slide_up
+    ;push offset board
+    ;call print
+    ;add sp, 2
+    ;mov dl, 10      ; Line Feed
+    ;int 21h
+
+    ;call slide_down
+    ;push offset board
+    ;call print
+    ;add sp, 2
+
 
     mov ah, 4Ch
     int 21h
