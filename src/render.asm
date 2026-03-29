@@ -239,6 +239,24 @@ draw_board PROC ; КТ-4
     mov al, 188     ; ╝ 188
     mov es:[di], ax
 
+    mov cx, 4
+    xor ax, ax
+    rows:
+    push cx
+    mov cx, 4
+    xor bx, bx
+        columns:
+        push ax
+        push bx
+        call draw_tile
+        add sp, 4
+
+        inc bx
+        loop columns
+    pop cx
+    inc ax
+    loop rows
+
     pop cx
     pop bx
     pop ax
