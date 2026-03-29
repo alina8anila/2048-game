@@ -103,39 +103,7 @@ start:
     ; - - - - - - - TEST draw_column - - - - - - - -
     call draw_board
     ; вивести усі 16 клітинок різними кольорами
-    mov cx, 16
-    xor si, si
-    xor dx, dx
-    fill_board:     ; встановити степені
-    mov board[si], dl
-    inc si
-    cmp dx, 11
-    jne not_out_of_index
-    mov dx, 4       ; якщо всі степені вичерпалися, то почати знову з 4 (жовтий колір)
-    jmp next
-    not_out_of_index:
-    inc dx
-    next:
-    loop fill_board
-
-    mov cx, 4
-    xor ax, ax
-    rows:
-    push cx
-    mov cx, 4
-    xor bx, bx
-        columns:
-        push ax
-        push bx
-        call draw_tile
-        add sp, 4
-
-        inc bx
-        loop columns
-    pop cx
-    inc ax
-    loop rows
-
+    
     call draw_score
 
     mov ah, 4Ch
