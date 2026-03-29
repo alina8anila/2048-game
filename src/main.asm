@@ -30,9 +30,12 @@ locals @@
     msg_2       DB "No more moves!$"
     msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
     curr_score  DW 0    ; current score
+    CURR_LEN    EQU $-curr_msg-1
     best_score  DW 0    ; best score     
+    BEST_LEN    EQU $-best_msg-1
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
-
+    curr_msg    DB "Current score: $"
+    best_msg    DB "Best score: $"
 .CODE
 start:
     mov ax, @data
@@ -41,7 +44,50 @@ start:
     mov ax, 0B800h
     mov es, ax
 
-    ;code) 
+    mov ax, 1003h   ; function 10h, AH=10h, AL=03h
+    mov bl, 0        ; 0 = disable blinking
+    int 10h
+
+    call draw_board
+
+main_loop:
+    mov ah, 00h
+    int 16h     ; чекати на клавішу
+
+    cmp ah, 48h
+    je move_up
+
+    cmp ah, 50h
+    je move_down
+
+    cmp ah, 4Bh
+    je move_left
+
+    cmp ah, 4Dh
+    je move_right
+
+jmp main_loop
+
+    move_up:
+    call slide_up
+    jmp update_board
+
+    move_down:
+    call slide_down
+    jmp update_board
+
+    move_left:
+    call slide_left
+    jmp update_board
+
+    move_right:
+    call slide_right
+    jmp update_board
+
+    update_board:
+    call spawn_tile
+    call draw_board
+    jmp main_loop
 
     mov ah, 4Ch
     int 21h
