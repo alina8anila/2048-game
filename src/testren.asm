@@ -18,7 +18,22 @@
                 DB 02h  ; зелений
                 DB 0Ah  ; яскраво-зелений
     buffer      DB 8 DUP(0)
-    line        DB "2048$"
+    title       DB "2 0 4 8$"
+    hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
+    hint_1      DB "Press C to continue, R to restart or ESC to quit$"
+    hint_2      DB "Press R to restart or ESC to quit$"
+    hint_table  DW offset hint_0, offset hint_1, offset hint_2 ; таблиця повідомлень з підказками щодо клавіш
+    msg_0       DB "Join equal numbers and get to the 2048 tile!$"
+    msg_1       DB "You've reached 2048!$"
+    msg_2       DB "No more moves!$"
+    msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
+    curr_msg    DB "Current score: $"
+    CURR_LEN    EQU $-curr_msg-1
+    best_msg    DB "Best score: $"
+    BEST_LEN    EQU $-best_msg-1
+    curr_score  DW 342    ; current score
+    best_score  DW 8192    ; best score     
+    game_phase  DB 0         ;0-game is going, 1-win, 2-lose   
 .CODE
 start:
     mov ax, @data
@@ -32,14 +47,14 @@ start:
     mov ax, 1003h   ; function 10h, AH=10h, AL=03h
     mov bl, 0        ; 0 = disable blinking
     int 10h
-    ; Clear screen: fill with spaces, white on black
-    xor di, di
-    mov cx, 80 * 25
-    mov ax, 0720h  
-    @cls:
-    mov es:[di], ax
-    add di, 2
-    loop @cls
+    ; ; Clear screen: fill with spaces, white on black
+    ; xor di, di
+    ; mov cx, 80 * 25
+    ; mov ax, 0720h  
+    ; @cls:
+    ; mov es:[di], ax
+    ; add di, 2
+    ; loop @cls
 
     ; xor di, di
     ; mov si, offset tile_colors
@@ -86,6 +101,7 @@ start:
     ; add sp, 8
 
     ; - - - - - - - TEST draw_column - - - - - - - -
+    call draw_board
     ; вивести усі 16 клітинок різними кольорами
     mov cx, 16
     xor si, si
@@ -119,6 +135,8 @@ start:
     pop cx
     inc ax
     loop rows
+
+    call draw_score
 
     mov ah, 4Ch
     int 21h
