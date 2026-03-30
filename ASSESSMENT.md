@@ -11,6 +11,113 @@
 
 ---
 
+## КТ-4 (2026-03-29) — ✅ Усі вимоги виконані
+
+### Рекомендовані оцінки
+
+📹 [Loom](https://www.loom.com/share/d44fdc3a9ce9413788b794a3d76fa940) (Юлія) — баланс відео: Аліна 2 / Юлія 2 → збалансовано
+
+📊 Прогрес: ~57% (очікувано ~57% на КТ-4) — на графіку
+
+| Студент       | Відео (0/5) | Код (0–5) | Коментар                                                                                                                                 |
+| ------------- | :---------: | :-------: | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Паращій Аліна |      5      |     5     | Гарно! Усі 4 зсуви (slide_left/right/up/down з reverse та writeback), spawn_tile з PRNG та random_range. Повністю за планом КТ-4         |
+| Сахарова Юлія |      5      |     5     | Чудово! draw_board з рамкою та рендерингом 16 клітинок, draw_score, обробник клавіатури та ігровий цикл в main. Повноцінно грабельна гра |
+
+### Аналіз Loom-відео
+
+**Записано:** Юлія (~3 хв)
+
+| Критерій | Оцінка | Деталі |
+|----------|:------:|--------|
+| Технічне розуміння | ✅ Високе | Пояснено slide у всі 4 сторони (compress+merge+compress+writeback, reverse для right, крок по колонках для up/down). Описано spawn_tile з random_range та ймовірність 2 vs 4. Розуміє код партнерки |
+| Ownership та залученість | ✅ Обидва залучені | Юлія починає з роботи Аліни (зсуви, spawn_tile), потім описує свою (draw_board, draw_score, main_loop). Обидві активні |
+| Когерентність з кодом | ✅ Повна | Зсуви, draw_board з рамкою, draw_score, main loop з клавішами стрілок, демо через TD підтверджується кодом та скріншотами |
+| Якість комунікації | ✅ Добра | Структуроване: логіка → рендеринг → main → демо. Є "е-е", але пояснення зрозумілі. Показано і тести, і реальну гру |
+| 🚩 Червоні прапорці | ✅ Немає | Обидві студентки демонструють розуміння свого та чужого коду, робоча гра |
+
+### Ключові спостереження
+
+- **Повна відповідність плану КТ-4:** Аліною реалізовано slide_left/right/up/down + spawn_tile (план Student A), Юлією реалізовано draw_board + draw_score + обробник клавіатури (план Student B). Ігровий цикл працює від початку до кінця
+- **17 студентських комітів у вікні КТ-4** (Аліна 8, Юлія 9 з merge) — збалансована активність, обидві працювали кілька днів
+- **Гра вже грабельна:** клавіші стрілок → slide → spawn → перемальовування працює. Залишається check_game_over, check_win, анімація
+- **Зауваження з КТ-3 виправлено:** checkpoints.md тепер має правильну нумерацію секції КТ-4
+
+### Чеклист
+
+| | Перевірка | Статус |
+|---|-----------|--------|
+| 📋 | README з планом + emails | ✅ |
+| 📋 | checkpoints.md + секція КТ-4 | ✅ Секція КТ-4 з Loom-посиланням |
+| 📋 | Loom-відео | ✅ Записано Юлія (баланс: Аліна 2 / Юлія 2 → збалансовано) |
+| 📋 | Тема зареєстрована в Issue | ✅ |
+| 🔧 | slide_left (compress+merge+compress+writeback) | ✅ logic.asm — slide_left з compress_row, merge_row, compress_row та writeback у board (~50 рядків) |
+| 🔧 | slide_right/up/down (реверс, транспозиція) | ✅ logic.asm — slide_right з reverse, slide_up/slide_down з кроком по колонках. Усі 4 напрямки реалізовано |
+| 🔧 | spawn_tile з PRNG | ✅ logic.asm — spawn_tile: random_range для пошуку порожньої клітинки, ймовірність ступеня 1 (плитка 2) або 2 (плитка 4) (~112 рядків) |
+| 🔧 | draw_board (цикл по 16 клітинках) | ✅ render.asm — draw_board: очищення екрана, рамка (вертикальні/горизонтальні лінії, кути), цикл рендерингу 16 клітинок через draw_tile (~236 рядків) |
+| 🔧 | draw_score | ✅ render.asm — draw_score: заповнення кольором та вивід "Current Score" і "Best Score" (~62 рядки) |
+| 🔧 | Обробник клавіатури (INT 16h для стрілок) | ✅ main.asm — main_loop: INT 16h AH=00h, перевірка scan-кодів 48h/50h/4Bh/4Dh, виклик slide_*/spawn_tile/draw_board |
+| 🔒 | Верифікація push | ✅ 25 пушів до дедлайну, 0 після |
+
+### Внесок по комітах
+
+**Паращій Аліна** (alina8anila) — 8 комітів (з них 1 merge, 1 fix), ~372 рядки коду:
+
+- 28 берез. 10:31 (1579493) — `feat: implement slide_left PROC` — logic.asm: slide_left з compress_row, merge_row, compress_row та writeback (+50/-7)
+- 28 берез. 10:50 (89f558c) — `feat:imprement slide_right PROC` — logic.asm: slide_right з reverse (+59/-11)
+- 28 берез. 18:08 (1b0abba) — `feat: implement slide_up PROC` — logic.asm: slide_up з кроком по колонках (+61/-28); testlog.asm тести (+11/-24)
+- 28 берез. 18:13 (3639dc2) — `feat: implement slide_down PROC` — logic.asm: slide_down (+56/-9)
+- 28 берез. 18:22 (1b62807) — `feat: add "row" to .Data and "locals @@"` — main.asm: row DW, locals @@ (+2/-0)
+- 28 берез. 18:28 (1e80aa6) — `test: slides` — testlog.asm: тести для 4 зсувів (+32/-5)
+- 29 берез. 04:14 (2e6f3e6) — `feat: implement spawn_tile PROC` — logic.asm: spawn_tile з random_range, ймовірність 2/4 (+80/-6); testlog.asm (+32/-29)
+- 23 берез. 22:53 (db641bb) — merge (ASSESSMENT.md)
+
+**Сахарова Юлія** (Julia Sakharova) — 9 комітів (з них 1 merge, 1 test, 1 docs):
+
+- 28 берез. 20:29 (21f8442) — `feat: add separate current and best scores` — main.asm (+1/-1)
+- 28 берез. 20:30 (5d6eb2c) — `feat: implement draw_score PROC` — render.asm: draw_score з кольоровим рядком (+62/-1)
+- 29 берез. 19:04 (512de78) — merge з main (logic.asm +284/-26, main.asm +2, testlog.asm +39/-22)
+- 29 берез. 19:57 (38a57c6) — `feat: implement (not parameterized) draw_board PROC` — render.asm: draw_board з рамкою та рендерингом клітинок (+236/-2)
+- 29 берез. 19:58 (e2e16b8) — `test: add variables and test draw_board, draw_score` — testren.asm: тести draw_board та draw_score (+27/-9)
+- 29 берез. 21:01 (8a50b43) — `feat: draw tiles inside draw_board PROC` — render.asm: рендеринг 16 клітинок через draw_tile (+18/-0)
+- 29 берез. 21:02 (9b23e92) — `feat: add variables and main_loop` — main.asm: ігровий цикл з обробкою клавіш стрілок, виклик slide_*/spawn_tile/draw_board (+48/-2)
+- 29 берез. 21:09 (51fbdeb) — `test: delete unecessary code` — testren.asm очищення (+1/-33)
+- 29 берез. 21:27 (cf2f10e) — `docs: add checkpoint 4` — checkpoints.md (+6/-1)
+
+**Баланс:** Аліна 8 комітів / ~372 рядки (зсуви, spawn_tile), Юлія 9 комітів / ~394 рядки (draw_board, draw_score, main_loop) — ✅ збалансовано
+
+### Якість комітів
+
+✅ **Відповідає вимогам**
+
+- **Conventional Commits:** ~90% — `feat:`, `test:`, `fix:`, `docs:`, `refactor:` використовуються. Merge без префікса
+- **Imperative mood:** ✅ "implement", "add", "delete"
+- **Мова:** ✅ англійська
+- **Гранулярність:** ✅ один коміт = одна процедура (slide_left, slide_right, slide_up, slide_down, spawn_tile, draw_board, draw_score). Зразкова гранулярність
+- **GitHub Issues:** ❌ лише Issue #1 (КТ-1), PR workflow відсутній
+- **Структура репо:** ✅ src/, .gitignore наявний
+
+### Верифікація (theme plan cross-check)
+
+**Студент A (Аліна) — план КТ-4:** «Реалізувати slide_left повністю (compress+merge+compress+writeback). Адаптувати для slide_right (реверс), slide_up/slide_down (транспозиція). Додати spawn_tile з PRNG. Перша інтеграція: main.asm викликає логіку та рендеринг — ігровий цикл працює від початку до кінця.»
+
+- slide_left: ✅
+- slide_right (реверс): ✅
+- slide_up/slide_down (транспозиція): ✅ (крок по колонках)
+- spawn_tile з PRNG: ✅ (random_range, ймовірність 2/4)
+- Перша інтеграція: ✅ (main_loop у main.asm)
+- Відповідність: 5/5 → оцінка 5 обґрунтована
+
+**Студент B (Юлія) — план КТ-4:** «Реалізувати draw_board (цикл по 16 клітинках), draw_score. Підключити обробник клавіатури (INT 16h для стрілок). Інтеграція: клавіатура → виклик slide_* → перемалювання поля.»
+
+- draw_board: ✅
+- draw_score: ✅
+- Обробник клавіатури: ✅ (INT 16h, стрілки 48h/50h/4Bh/4Dh)
+- Інтеграція: ✅
+- Відповідність: 4/4 → оцінка 5 обґрунтована
+
+---
+
 ## КТ-3 (2026-03-22) — ⚠️ Частково виконано
 
 ### Рекомендовані оцінки
