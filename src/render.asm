@@ -22,9 +22,9 @@ draw_board PROC ; КТ-4
     loop @cls
 
     ; вивести рамку
-    ; з draw_tile: row = 5 + (tile_height+1) * grid_row,   column = 25 + (tile_width+1) * grid_column 
-    ; Верхня границя рамки: (4, 24) - кут
-    ; Нижня границя рамки: (4+4*(TILE_HEIGHT+1), 24+4*(TILE_WIDTH+1))
+    ; з draw_tile: row = start_row + (tile_height + 1) * grid_row,   column = start_col + (tile_width + 1) * grid_column 
+    ; Верхня границя рамки: (start_row - 1, start_col - 1) - кут
+    ; Нижня границя рамки: (start_row - 1 + 4*(TILE_HEIGHT+1), start_col - 1 + 4*(TILE_WIDTH+1))
 
     ; зовнішня рамка
     ; ASCII: ║ 186, ═ 205, ╟ 199, ╢ 182, ╧ 207, ╤ 209, ╔ 201, ╗ 187, ╚ 200, ╝ 188
@@ -33,31 +33,39 @@ draw_board PROC ; КТ-4
 
     ; ------- горизонтальні лінії -------
     ; скільки стовпців треба пройти (без кутових)
-    
     mov cx, TILE_WIDTH
     inc cx
     shl cx, 2
     dec cx
 
-    mov bx, 25
-    horizontal:
-    push cx
+    call find_start_col
+    mov bx, dx  ; start_col
     ; DI = (row * 80 + column) * 2
-    ; column % (WIDTH + 1) == 0 - на межі з клітинкою
-    mov ax, 4   ; row
+    call find_start_row
+    mov ax, dx
+    dec ax  ; start_row - 1
     mov dx, 80
     mul dx
     add ax, bx
     shl ax, 1
     mov di, ax
+    
+    horizontal:
+    push cx
     push di
+    ; local_col = current_col - start_col,   bx = current_col
+    ; offset = local_col % (WIDTH + 1)
+    ; offset = 0 -> on_boarder
 
     mov ax, bx
+    call find_start_col
+    sub ax, dx  ; ax = local_col
+
     xor dx, dx
     mov dl, TILE_WIDTH
     inc dl
     div dl  ; ah - остача
-    cmp ah, 0
+    cmp ah, TILE_WIDTH
     je @on_hor_boundary
 
     mov ah, 0Fh
@@ -94,9 +102,9 @@ draw_board PROC ; КТ-4
     mov ax, 80
     mov dl, TILE_HEIGHT
     inc dl
-    mul dl 
+    mul dl
     shl ax, 1
-    mov dx, ax  ; offset по рядкам
+    mov dx, ax
     add di, dx  ; перейти до наступного горизонтального рядка
     
     mov cx, 3
@@ -127,25 +135,34 @@ draw_board PROC ; КТ-4
     shl cx, 2
     dec cx
 
-    mov si, 5       ; рядок 5
-    vertical:
-    push cx
+    call find_start_row
+    mov si, dx
     ; DI = (row * 80 + column) * 2
-    ; row % (HEIGHT + 1) == 0 - на межі з клітинкою
     mov ax, si
     mov dx, 80
     mul dx
-    add ax, 24
+    call find_start_col
+    dec dx
+    add ax, dx
     shl ax, 1
     mov di, ax
+
+    vertical:
+    push cx
     push di
+    ; local_row = current_row - start_row,   si = current_row
+    ; offset = local_row % (HEIGHT + 1)
+    ; offset = 0 -> on_boarder
 
     mov ax, si
+    call find_start_row
+    sub ax, dx  ; ax = local_col
+
     xor dx, dx
     mov dl, TILE_HEIGHT
     inc dl
     div dl  ; ah - остача
-    cmp ah, 0
+    cmp ah, TILE_HEIGHT
     je @on_vert_boundary
 
     mov ah, 0Fh
@@ -181,8 +198,8 @@ draw_board PROC ; КТ-4
     mov dx, 4
     mul dx
     shl ax, 1
-    mov dx, ax  ; offset по рядкам
-    add di, dx  ; перейти до найправішох вертикалі
+    mov dx, ax
+    add di, dx  ; перейти до найправішої вертикалі
 
     mov ah, 0Fh
     mov al, 182     ; ╢ 182
@@ -190,17 +207,21 @@ draw_board PROC ; КТ-4
 
     @next_row:
     pop di
-    add di, 2
+    add di, 160
 
     inc si
     pop cx
     loop vertical
 
     ; ------- кути -------
-    mov ax, 4
+    call find_start_row
+    dec dx
+    mov ax, dx
     mov dx, 80
     mul dx
-    add ax, 24
+    call find_start_col
+    dec dx
+    add ax, dx
     shl ax, 1
     mov di, ax
     push di
@@ -239,23 +260,23 @@ draw_board PROC ; КТ-4
     mov al, 188     ; ╝ 188
     mov es:[di], ax
 
-    mov cx, 4
-    xor ax, ax
-    rows:
-    push cx
-    mov cx, 4
-    xor bx, bx
-        columns:
-        push ax
-        push bx
-        call draw_tile
-        add sp, 4
+        mov cx, 4
+        xor ax, ax
+        rows:
+        push cx
+        mov cx, 4
+        xor bx, bx
+            columns:
+            push ax
+            push bx
+            call draw_tile
+            add sp, 4
 
-        inc bx
-        loop columns
-    pop cx
-    inc ax
-    loop rows
+            inc bx
+            loop columns
+        pop cx
+        inc ax
+        loop rows
 
     pop cx
     pop bx
