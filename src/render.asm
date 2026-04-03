@@ -427,22 +427,24 @@ draw_tile PROC ; КТ-3
     mov bx, 1
     shl bx, cl         ; множення на 2 (піднесення в степінь)
 
+    ; padding_row = (TILE_HEIGHT - 1) / 2
+    mov ax, TILE_HEIGHT
+    dec ax
+    shr ax, 1
+    mov cx, ax ; cx = padding_row
+        pop ax ; повернути рядок
+    add ax, cx
+
     push bx             ; значення плитки
     call num_to_str     ; рядок у buffer, довжина у cx
     add sp, 2
-
-    ; paddingX = (TILE_WIDTH - string_length) / 2
-    mov ax, TILE_WIDTH
-    sub ax, cx
-    shr ax, 1
-    mov cx, ax
-
-        ; повернути збережені рядок та колонку
-        pop ax
-        pop bx
-
-    inc ax
-    add bx, cx          ; add padding
+    ; padding_col = (TILE_WIDTH - string_length) / 2
+    mov bx, TILE_WIDTH
+    sub bx, cx
+    shr bx, 1
+    mov cx, bx ; cx = padding_col
+        pop bx ; повернути стовпець
+    add bx, cx
 
     xor dx, dx
     mov dl, tile_colors[si]
