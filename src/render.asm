@@ -305,6 +305,44 @@ print_line PROC
     ret
     print_line ENDP
 
+find_start_row PROC
+    push bp
+    mov bp, sp
+    push bx
+    ; start_row = (25 - (4 * TILE_HEIGHT + 3)) / 2
+    ; повернути в dx
+
+    mov dx, 25
+    mov bx, TILE_HEIGHT
+    shl bx, 2
+    add bx, 3
+    sub dx, bx
+    shr dx, 1
+
+    pop bx
+    pop bp
+    ret
+find_start_row ENDP
+
+find_start_col PROC
+    push bp
+    mov bp, sp
+    push bx
+    ; start_col = (80 - (4 * TILE_WIDTH + 3)) / 2
+    ; повернути в dx
+
+    mov dx, 80
+    mov bx, TILE_WIDTH
+    shl bx, 2
+    add bx, 3
+    sub dx, bx
+    shr dx, 1
+
+    pop bx
+    pop bp
+    ret
+find_start_col ENDP
+
 draw_tile PROC ; КТ-3
 ; намалювати одну клітинку з її значенням
     push bp
@@ -329,19 +367,22 @@ draw_tile PROC ; КТ-3
     xor ah, ah   
     mov si, ax     ; si - power of 2
 
-    ; row = 5 + (tile_height+1) * grid_row,   column = 25 + (tile_width+1) * grid_column 
+    ; row = start_row + (tile_height+1) * grid_row,   column = start_col + (tile_width+1) * grid_column 
     ; з відступами від країв та місцями для рамки МІЖ клітинками
     mov ax, [bp+4]
     mov di, TILE_WIDTH
     inc di
     mul di
-    add ax, 25
+    call find_start_col ; dx = start_col
+    add ax, dx
     mov bx, ax      ; bx - column
+
     mov ax, [bp+6]
     mov di, TILE_HEIGHT 
     inc di
-    mul di          
-    add ax, 5       ; ax - row
+    mul di    
+    call find_start_row ; dx = start_row   
+    add ax, dx      ; ax - row
 
         ; зберегти колонку, рядок та index
         push bx
@@ -390,7 +431,7 @@ draw_tile PROC ; КТ-3
     call num_to_str     ; рядок у buffer, довжина у cx
     add sp, 2
 
-    ; padding = (cell_width - string_length) / 2
+    ; paddingX = (TILE_WIDTH - string_length) / 2
     mov ax, TILE_WIDTH
     sub ax, cx
     shr ax, 1
@@ -407,8 +448,8 @@ draw_tile PROC ; КТ-3
     mov dl, tile_colors[si]
     shl dx, 4
     push dx
-    push ax
-    push bx
+    push ax ; row
+    push bx ; column
     push offset buffer
     call print_line
     add sp, 8
