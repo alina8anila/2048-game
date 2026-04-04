@@ -5,6 +5,7 @@ locals @@
 .DATA
     row         DB 0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
     board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
+    saveboard   DB 16 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
     prevboard   DB 16 DUP(0)
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
