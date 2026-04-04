@@ -554,6 +554,7 @@ draw_score PROC ; КТ-4
     push ax
     push bx
     push cx
+    push di
 
     ; заповнити рядок синім кольором
     xor di, di
@@ -612,6 +613,7 @@ draw_score PROC ; КТ-4
     call print_line
     add sp, 8
 
+    pop di
     pop cx
     pop bx
     pop ax
@@ -623,16 +625,270 @@ draw_game_over PROC ; КТ-5
 ; вивід повідомлення GAME OVER
     push bp
     mov bp, sp
+    push ax
+    push bx
+    push cx
+    push di
 
+    ; стала позиція
+    ; вікно 23x7
+    ; row=(25-7)/2=9, column=(80-21)/2=28
+    
+    ; рамка
+    ; ASCII: ║ 186, ═ 205, ╔ 201, ╗ 187, ╚ 200, ╝ 188
+    ; ------- горизонтальні лінії -------
+    mov ax, 9
+    mov bx, 29
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+
+    mov cx, 21  ; 23-2=21 через кути
+    @hor:
+    push di
+    mov ah, 4Eh
+    mov al, 205 ; ═ 205
+    mov es:[di], ax
+    add di, 160*6
+    mov es:[di], ax
+    pop di
+    add di, 2
+    loop @hor
+
+    ; ------- вертикальні лінії -------
+    mov ax, 10
+    mov bx, 28
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+
+    mov cx, 5   ; 7-2=5 через кути
+    @vert:
+    push di
+    mov ah, 4Eh
+    mov al, 186 ; ║ 186
+    mov es:[di], ax
+    add di, 22*2
+    mov es:[di], ax
+    pop di
+    add di, 160
+    loop @vert
+
+    ; ------- кути -------
+    mov ax, 9
+    mov bx, 28
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    push di
+
+    mov ah, 4Eh
+    mov al, 201 ; ╔ 201
+    mov es:[di], ax
+
+    add di, 22*2
+
+    mov ah, 4Eh
+    mov al, 187 ; ╗ 187
+    mov es:[di], ax
+
+    pop di
+    add di, 160*6
+
+    mov ah, 4Eh
+    mov al, 200 ; ╚ 200
+    mov es:[di], ax
+
+    add di, 22*2
+
+    mov ah, 4Eh
+    mov al, 188 ; ╝ 188
+    mov es:[di], ax
+
+    ; вікно
+    mov ax, 9
+    inc ax
+    mov bx, 28
+    inc bx
+    mov cx, 5   ; 7-2=5 через рамку
+    @rows:
+    push cx
+    push bx
+    push ax
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    mov cx, 21  ; 23-2=21 через рамку
+        @columns:
+        mov ah, 04h
+        mov al, 219
+        mov es:[di], ax
+        add di, 2
+        loop @columns
+    pop ax
+    inc ax
+    pop bx
+    pop cx
+    loop @rows
+
+    ; text="G A M E   O V E R", length=17
+    ; text_row=row+7/2=9+3=12, text_column=column+(23-length)/2=28+3=31
+
+    push 4Eh
+    push 12
+    push 31
+    push offset g_over
+    call print_line
+    add sp, 8
+
+    pop di
+    pop cx
+    pop bx
+    pop ax
     pop bp
     ret
     draw_game_over ENDP
 
 draw_win PROC ; КТ-5
 ; вивід повідомлення WIN
-    push bp
+        push bp
     mov bp, sp
+    push ax
+    push bx
+    push cx
+    push di
 
+    ; стала позиція
+    ; вікно 23x7
+    ; row=(25-7)/2=9, column=(80-21)/2=28
+    
+    ; рамка
+    ; ASCII: ║ 186, ═ 205, ╔ 201, ╗ 187, ╚ 200, ╝ 188
+    ; ------- горизонтальні лінії -------
+    mov ax, 9
+    mov bx, 29
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+
+    mov cx, 21  ; 23-2=21 через кути
+    @@hor:
+    push di
+    mov ah, 2Eh
+    mov al, 205 ; ═ 205
+    mov es:[di], ax
+    add di, 160*6
+    mov es:[di], ax
+    pop di
+    add di, 2
+    loop @@hor
+
+    ; ------- вертикальні лінії -------
+    mov ax, 10
+    mov bx, 28
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+
+    mov cx, 5   ; 7-2=5 через кути
+    @@vert:
+    push di
+    mov ah, 2Eh
+    mov al, 186 ; ║ 186
+    mov es:[di], ax
+    add di, 22*2
+    mov es:[di], ax
+    pop di
+    add di, 160
+    loop @@vert
+
+    ; ------- кути -------
+    mov ax, 9
+    mov bx, 28
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    push di
+
+    mov ah, 2Eh
+    mov al, 201 ; ╔ 201
+    mov es:[di], ax
+
+    add di, 22*2
+
+    mov ah, 2Eh
+    mov al, 187 ; ╗ 187
+    mov es:[di], ax
+
+    pop di
+    add di, 160*6
+
+    mov ah, 2Eh
+    mov al, 200 ; ╚ 200
+    mov es:[di], ax
+
+    add di, 22*2
+
+    mov ah, 2Eh
+    mov al, 188 ; ╝ 188
+    mov es:[di], ax
+
+    ; вікно
+    mov ax, 9
+    inc ax
+    mov bx, 28
+    inc bx
+    mov cx, 5   ; 7-2=5 через рамку
+    @@rows:
+    push cx
+    push bx
+    push ax
+    mov dx, 80
+    mul dx
+    add ax, bx
+    shl ax, 1
+    mov di, ax
+    mov cx, 21  ; 23-2=21 через рамку
+        @@columns:
+        mov ah, 02h
+        mov al, 219
+        mov es:[di], ax
+        add di, 2
+        loop @@columns
+    pop ax
+    inc ax
+    pop bx
+    pop cx
+    loop @@rows
+
+    ; text="Y O U   W O N", length=13
+    ; text_row=row+7/2=9+3=12, text_column=column+(23-length)/2=28+5=33
+
+    push 2Eh
+    push 12
+    push 33
+    push offset g_win
+    call print_line
+    add sp, 8
+
+    pop di
+    pop cx
+    pop bx
+    pop ax
     pop bp
     ret
     draw_win ENDP
