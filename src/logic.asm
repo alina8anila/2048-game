@@ -404,15 +404,38 @@ random_range PROC
 
 check_game_over PROC ; КТ-5
 ; перевірка сусідніх рівних плиток
-    push bp
-    mov bp, sp
-    
-    ; пройтись по всім плиткам, перевірити:
-    ;  1. всі заповнені (не 0)
-    ;  2. сусідні не однакові
-    ; -> game over
+    push si
+    push cx
 
-    pop bp
+    push offset saveboard
+    push offset board
+    call copy_boards ;saveboard=board
+    add sp, 4
+
+    call slide_up
+    call slide_down
+    call slide_left
+    call slide_right
+
+    mov si, offset board
+    mov cx, 16
+    find0:
+        cmp [si], byte ptr 0
+        je notover ;if([si]==0) -> notover
+        inc si
+        loop find0
+    mov game_phase, byte ptr 2 ;game over=2
+    jmp end_checkgo
+
+    notover:
+    mov game_phase, byte ptr 0 ;0=game is going
+    push offset board
+    push offset saveboard
+    call copy_boards ;board=saveboard
+    add sp, 4
+    end_checkgo:
+    pop cx
+    pop si
     ret
     check_game_over ENDP
 
@@ -457,7 +480,7 @@ copy_boards PROC
     for_copy:
         mov al, [si]
         mov [di], al
-        inc al
+        inc si
         inc di
         loop for_copy
     pop ax
