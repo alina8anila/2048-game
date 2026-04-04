@@ -532,7 +532,7 @@ compare_boards PROC
         mov al, [si]
         cmp [di], al
         jne noteq
-        inc al
+        inc si
         inc di
         loop for_compare
     
