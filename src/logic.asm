@@ -441,3 +441,29 @@ check_win PROC ; КТ-5
     pop bp
     ret
     check_win ENDP
+
+copy_boards PROC
+    push bp
+    mov bp, sp
+    push si
+    push di
+    push cx
+    push ax
+
+    mov di, [bp+6] ;to this board
+    mov si, [bp+4] ;form this board
+
+    mov cx, 16
+    for_copy:
+        mov al, [si]
+        mov [di], al
+        inc al
+        inc di
+        loop for_copy
+    pop ax
+    pop cx
+    pop di
+    pop si
+    pop bp
+    ret
+    copy_boards ENDP
