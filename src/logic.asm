@@ -549,3 +549,11 @@ compare_boards PROC
     pop bp
     ret
     compare_boards ENDP
+
+prevboard_eq_board PROC
+    push offset prevboard
+    push offset board
+    call copy_boards
+    add sp, 4
+    ret
+    prevboard_eq_board ENDP
