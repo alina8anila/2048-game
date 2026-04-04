@@ -440,6 +440,31 @@ check_game_over PROC ; КТ-5
     check_game_over ENDP
 
 check_win PROC ; КТ-5
+;якщо плитка 2048 нова -> win якщо її нема або вона вже була то гра продовжуєтося
+    push ax
+
+    push offset prevboard
+    call check_if_have_2024
+    add sp, 2
+    cmp ax, 1 ;if prevboard have 2024 (ax==1) -> not win
+    je notwin
+
+    push offset board
+    call check_if_have_2024
+    add sp, 2
+    cmp ax, 0
+    je notwin;if board don't have 2024 (ax==0) -> not win
+
+    mov game_phase, 1
+    jmp end_checkwin
+    notwin: 
+    mov game_phase, 0
+    end_checkwin:
+    pop ax
+    ret
+    check_win ENDP
+
+check_if_have_2024 PROC ; КТ-5
 ;якщо є плитка 2048, то ax=1, інакше ax=0. Подаємо offset board
     push bp
     mov bp, sp
@@ -448,22 +473,22 @@ check_win PROC ; КТ-5
 
     mov si, [bp+4]   ;board offset
     mov cx, 16
-    for_checkwin:
+    for_check2024:
         cmp [si], byte ptr 11 ;11-це 2048
-        je win
+        je have2024
         inc si
-        loop for_checkwin
-    xor ax, ax ;0=game is going
-    jmp end_checkwin
-    win:
-    mov al, 1 ;win=1
+        loop for_check2024
+    xor ax, ax
+    jmp end_check2024
+    have2024:
+    mov ax, 1 
 
-    end_checkwin:
+    end_check2024:
     pop cx
     pop si
     pop bp
     ret
-    check_win ENDP
+    check_if_have_2024 ENDP
 
 copy_boards PROC
     push bp
