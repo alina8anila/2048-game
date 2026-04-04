@@ -50,6 +50,7 @@ start:
     mov bl, 0        ; 0 = disable blinking
     int 10h
 
+    call spawn_tile
     call draw_board
 
 main_loop:
@@ -71,23 +72,34 @@ main_loop:
 jmp main_loop
 
     move_up:
+    call prevboard_eq_board
     call slide_up
     jmp update_board
 
     move_down:
+    call prevboard_eq_board
     call slide_down
     jmp update_board
 
     move_left:
+    call prevboard_eq_board
     call slide_left
     jmp update_board
 
     move_right:
+    call prevboard_eq_board
     call slide_right
     jmp update_board
 
     update_board:
+    push offset board
+    push offset prevboard
+    call compare_boards ;if(board==prevboard) ax=1 else ax=0
+    add sp, 4
+    cmp ax, 1           ;if(board==prevboard) don't spawn tile
+    je skip_spawn
     call spawn_tile
+    skip_spawn:
     call draw_board
     jmp main_loop
 
