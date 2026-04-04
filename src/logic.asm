@@ -417,12 +417,27 @@ check_game_over PROC ; КТ-5
     check_game_over ENDP
 
 check_win PROC ; КТ-5
-; пошук плитки 2048
+;якщо є плитка 2048, то ax=1, інакше ax=0. Подаємо offset board
     push bp
     mov bp, sp
-    
-    ; якщо є плитка 2024 -> win
+    push si
+    push cx
 
+    mov si, [bp+4]   ;board offset
+    mov cx, 16
+    for_checkwin:
+        cmp [si], byte ptr 11 ;11-це 2048
+        je win
+        inc si
+        loop for_checkwin
+    xor ax, ax ;0=game is going
+    jmp end_checkwin
+    win:
+    mov al, 1 ;win=1
+
+    end_checkwin:
+    pop cx
+    pop si
     pop bp
     ret
     check_win ENDP
