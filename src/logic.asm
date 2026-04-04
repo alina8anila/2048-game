@@ -467,3 +467,37 @@ copy_boards PROC
     pop bp
     ret
     copy_boards ENDP
+
+compare_boards PROC
+    ; set ax=1 if same, ax=0 otherwise
+    push bp
+    mov bp, sp
+    push si
+    push di
+    push cx
+
+    mov di, [bp+6] ;fir
+    mov si, [bp+4] ;sec
+
+    mov cx, 16
+    for_compare:
+        mov al, [si]
+        cmp [di], al
+        jne noteq
+        inc al
+        inc di
+        loop for_compare
+    
+    mov ax, 1
+    jmp end_compare
+    noteq:
+    mov ax, 0
+    jmp end_compare
+
+    end_compare:
+    pop cx
+    pop di
+    pop si
+    pop bp
+    ret
+    compare_boards ENDP

@@ -5,6 +5,7 @@ locals @@
 .DATA
     row         DB 0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
     board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
+    prevboard   DB 16 DUP(0)
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
     tile_colors DB 00h  ; чорний            пуста клітинка

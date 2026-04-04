@@ -3,10 +3,12 @@
 locals @@
 
 .DATA
-    board   DB 3, 0, 3, 3 
-            DB 3, 3, 3, 3
-            DB 3, 3, 3, 3
-            DB 0, 3, 3, 0
+    board   DB 1, 1, 1, 1 
+            DB 1, 1, 1, 1
+            DB 1, 1, 6, 1
+            DB 1, 10, 12, 1
+
+    board2 DB 16 DUP(0)
     
     row  db 1, 0, 1, 2
 
@@ -15,14 +17,32 @@ start:
     mov ax, @data
     mov ds, ax
 
-    call spawn_tile
+    push offset board  ;to
+    push offset board2 ;form
+    call compare_boards
+    add sp, 4
+    mov ah, 02h
+    mov dl, al
+    add dl, '0'
+    int 21h
+
+    push offset board  ;to
+    push offset board2 ;form
+    call copy_boards
+    add sp, 4
 
     push offset board
     call print
     add sp, 2
-    ;mov ah, 02h
-    ;mov dl, 10      ; Line Feed
-    ;int 21h
+
+    push offset board  ;to
+    push offset board2 ;form
+    call compare_boards
+    add sp, 4
+    mov ah, 02h
+    mov dl, al
+    add dl, '0'
+    int 21h
 
     ;call slide_left
     ;push offset board
