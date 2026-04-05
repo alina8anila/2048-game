@@ -101,6 +101,12 @@ merge_row PROC ; КТ-3
             add sp, 2
             add curr_score, ax
 
+            mov ax, curr_score
+            cmp ax, best_score
+            jle not_set_best_score
+            mov best_score, ax
+            not_set_best_score:
+
             mov [si+1], byte ptr 0 ;right=0
             inc si
         inc_si_merge:
