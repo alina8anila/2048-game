@@ -52,6 +52,7 @@ start:
 
     call spawn_tile
     call draw_board
+    call draw_score
 
 main_loop:
     mov ah, 00h
@@ -101,6 +102,7 @@ jmp main_loop
     call spawn_tile
     skip_spawn:
     call draw_board
+    call draw_score
     jmp main_loop
 
     mov ah, 4Ch
