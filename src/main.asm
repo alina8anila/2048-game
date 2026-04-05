@@ -23,6 +23,8 @@ locals @@
                 DB 0Ah  ; яскраво-зелений   2¹¹=2048
     buffer      DB 8 DUP(0)       ; для збереження рядка
     title       DB "2048$"
+    g_over      DB "G A M E   O V E R$"
+    g_win       DB "Y O U   W O N$"
     hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
     hint_1      DB "Press C to continue, R to restart or ESC to quit$"
     hint_2      DB "Press R to restart or ESC to quit$"
@@ -51,8 +53,10 @@ start:
     int 10h
 
     call spawn_tile
+    call spawn_tile
     call draw_board
     call draw_score
+    jmp main_loop
 
 main_loop:
     mov ah, 00h
