@@ -743,9 +743,36 @@ draw_game_over PROC ; КТ-5
     ; text_row=row+7/2=9+3=12, text_column=column+(23-length)/2=28+3=31
 
     push 4Eh
-    push 12
+    push 11
     push 31
     push offset g_over
+    call print_line
+    add sp, 8
+
+    ; 28+(23-CURR_LEN)/2
+    mov bx, 23
+    sub bx, CURR_LEN
+    shr bx, 1
+    add bx, 28
+    push 4Eh
+    push 13
+    push bx
+    push offset curr_msg
+    call print_line
+    add sp, 8
+
+    push curr_score
+    call num_to_str
+    add sp, 2
+    ; 28+(23-cx)/2
+    mov bx, 23
+    sub bx, cx
+    shr bx, 1
+    add bx, 28
+    push 4Eh
+    push 14
+    push bx
+    push offset buffer
     call print_line
     add sp, 8
 
