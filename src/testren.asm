@@ -2,7 +2,7 @@
 .STACK 100h
 
 .DATA
-    board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
+    board       DB 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1, 2, 3, 4
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
     tile_colors DB 00h
@@ -19,6 +19,8 @@
                 DB 0Ah  ; яскраво-зелений
     buffer      DB 8 DUP(0)
     title       DB "2 0 4 8$"
+    g_over      DB "G A M E   O V E R$"
+    g_win       DB "Y O U   W O N$"
     hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
     hint_1      DB "Press C to continue, R to restart or ESC to quit$"
     hint_2      DB "Press R to restart or ESC to quit$"
@@ -103,8 +105,10 @@ start:
     ; - - - - - - - TEST draw_column - - - - - - - -
     call draw_board
     ; вивести усі 16 клітинок різними кольорами
-    
+
     call draw_score
+    ; call draw_game_over
+    call draw_win
 
     mov ah, 4Ch
     int 21h
