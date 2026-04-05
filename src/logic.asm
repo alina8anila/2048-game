@@ -471,7 +471,6 @@ check_game_over PROC ; КТ-5
     jmp end_checkgo
 
     notover:
-    mov game_phase, byte ptr 0 ;0=game is going
     push offset board
     push offset saveboard
     call copy_boards ;board=saveboard
@@ -499,10 +498,7 @@ check_win PROC ; КТ-5
     je notwin;if board don't have 2024 (ax==0) -> not win
 
     mov game_phase, 1
-    jmp end_checkwin
     notwin: 
-    mov game_phase, 0
-    end_checkwin:
     pop ax
     ret
     check_win ENDP
