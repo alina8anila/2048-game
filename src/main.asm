@@ -32,12 +32,12 @@ locals @@
     msg_2       DB "No more moves!$"
     msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
     curr_score  DW 0    ; current score
+    curr_msg    DB "Current score: $"
     CURR_LEN    EQU $-curr_msg-1
-    best_score  DW 0    ; best score     
+    best_score  DW 0    ; best score 
+    best_msg    DB "Best score: $"    
     BEST_LEN    EQU $-best_msg-1
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
-    curr_msg    DB "Current score: $"
-    best_msg    DB "Best score: $"
 .CODE
 start:
     mov ax, @data
@@ -69,6 +69,13 @@ main_loop:
 
     cmp ah, 4Dh
     je move_right
+
+    cmp ah, 01h ; ESC
+    jne @@continue
+    mov ah, 4Ch
+    int 21h
+
+    @@continue:
 
 jmp main_loop
 
