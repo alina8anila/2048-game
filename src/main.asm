@@ -114,8 +114,24 @@ jmp main_loop
     skip_spawn:
     call draw_board
     call draw_score
+
+    call check_game_over
+    call check_win
+
+    cmp game_phase, 1
+    je win
+    cmp game_phase, 2
+    je game_over
     jmp main_loop
 
+    win:
+    call draw_win
+    jmp end_game
+    game_over:
+    call draw_game_over
+    jmp end_game
+
+    end_game:
     mov ah, 4Ch
     int 21h
 
