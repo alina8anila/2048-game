@@ -2,6 +2,31 @@
 ; logic.asm - процедури ігрової логіки
 ; ===========================================
 
+get_num PROC
+    ;ax=pow(2, [bp+4])
+    push bp
+    mov bp, sp
+    push cx
+    push bx
+
+    mov ax, 1
+    mov bx, 2
+    xor cx, cx
+    mov cl, [bp+4]
+
+    cmp cx, 0
+    je end_getnum ;if([bp+4]==0) return 1
+    for_getnum:
+        mul bx
+        loop for_getnum
+    end_getnum:
+
+    pop bx
+    pop cx
+    pop bp
+    ret
+    get_num ENDP
+
 compress_row PROC ; КТ-3
 ; збір ненульових плиток (для slide_left)
     push bp
@@ -70,6 +95,12 @@ merge_row PROC ; КТ-3
         
         merge_2blocks:
             inc byte ptr [si]      ;left++
+
+            push [si]
+            call get_num
+            add sp, 2
+            add curr_score, ax
+
             mov [si+1], byte ptr 0 ;right=0
             inc si
         inc_si_merge:
