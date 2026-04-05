@@ -59,6 +59,15 @@ start:
     jmp main_loop
 
 main_loop:
+    ; перевірка стану гри
+    call check_win
+    cmp game_phase, 1
+    je win_loop
+
+    call check_game_over
+    cmp game_phase, 2
+    je over_loop
+
     mov ah, 00h
     int 16h     ; чекати на клавішу
 
@@ -75,13 +84,31 @@ main_loop:
     je move_right
 
     cmp ah, 01h ; ESC
-    jne @@continue
+    je @end
+jmp main_loop
+
+    @end:
     mov ah, 4Ch
     int 21h
 
-    @@continue:
+    win_loop:
+    call draw_win
+    mov ah, 00h
+    int 16h
+    cmp ah, 01h ; ESC
+    je @end
+    ; обробити R
+    ; обробити С 
+    jmp win_loop
 
-jmp main_loop
+    over_loop:
+    call draw_game_over
+    mov ah, 00h
+    int 16h
+    cmp ah, 01h ; ESC
+    je @end
+    ; обробити R
+    jmp over_loop
 
     move_up:
     call prevboard_eq_board
