@@ -449,10 +449,16 @@ check_game_over PROC ; КТ-5
     call copy_boards ;saveboard=board
     add sp, 4
 
+    push curr_score
+    push best_score
+
     call slide_up
     call slide_down
     call slide_left
     call slide_right
+
+    pop best_score
+    pop curr_score
 
     mov si, offset board
     mov cx, 16
