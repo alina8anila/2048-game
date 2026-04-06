@@ -11,6 +11,106 @@
 
 ---
 
+## КТ-5 (2026-04-05) — ✅ Усі вимоги виконані
+
+### Рекомендовані оцінки
+
+📹 [Loom](https://www.loom.com/share/d58735479fb341ffb5b542c2f728a912) (Аліна) — баланс відео: Аліна 3 / Юлія 2 → на КТ-6 записує Юлія
+
+📊 Прогрес: ~71% (очікувано ~71% на КТ-5) — на графіку
+
+| Студент | Відео (0/5) | Код (0–5) | Коментар |
+|---------|:-----------:|:---------:|----------|
+| Паращій Аліна | 5 | 5 | Стабільно на висоті! check_game_over, check_win, порожній хід, рахунок — повністю за планом КТ-5. Розумна реалізація через копію дошки та перевірку після всіх 4 зсувів |
+| Сахарова Юлія | 5 | 5 | Знову чудово! draw_game_over та draw_win з рамками, кольорами та текстом, README з аналізом підходів, параметризований draw_board — вище плану КТ-5 |
+
+### Аналіз Loom-відео
+
+**Записано:** Аліна (~3 хв)
+
+| Критерій | Оцінка | Деталі |
+|----------|:------:|--------|
+| Технічне розуміння | ✅ Високе | Пояснено алгоритм check_win (нова плитка: порівняння prevboard vs board), check_game_over (копія дошки → всі 4 зсуви → перевірка наявності нуля → відновлення), порожній хід (compare_boards), підрахунок рахунку в merge_row |
+| Ownership та залученість | ✅ Обидва залучені | Аліна детально описує свою роботу (логіка), згадує draw_win та draw_game_over Юлії. Показано спільну роботу: main_loop обробляє game_phase, win_loop/over_loop викликають render-процедури |
+| Когерентність з кодом | ✅ Повна | Усе описане підтверджується кодом: check_game_over в logic.asm, draw_win/draw_game_over в render.asm, main_loop з win_loop/over_loop в main.asm. Показано живе демо програш і виграш |
+| Якість комунікації | ⚠️ Лаконічна | Структурована і зрозуміла, є демо, але багато філерів "е-е-е". Пояснення технічні й конкретні |
+| 🚩 Червоні прапорці | ✅ Немає | Обидві студентки демонструють розуміння своїх частин, жива гра підтверджує коректність |
+
+### Ключові спостереження
+
+- **Повна відповідність плану КТ-5:** Аліна реалізувала check_game_over, check_win, порожній хід та підрахунок рахунку (план Student A); Юлія реалізувала draw_game_over, draw_win, README аналіз підходів та параметризований draw_board (план Student B + понад план)
+- **33 студентські коміти у вікні КТ-5** (Аліна ~18, Юлія ~11 з мержами) — активний тиждень, обидві студентки завершили основний функціонал
+- **Гра повністю функціональна:** ігровий цикл → зсуви → spawn → check_win → check_game_over → win/over screens. Залишається перезапуск та фінальне полірування
+- **check_win з продовженням гри:** реалізовано правильно — перемога спрацьовує лише якщо плитка 2048 нова (є в поточній дошці, але не в попередній)
+
+### Чеклист
+
+| | Перевірка | Статус |
+|---|-----------|--------|
+| 📋 | README з планом + emails | ✅ README з аналізом підходів A/B |
+| 📋 | checkpoints.md + секція КТ-5 | ✅ Секція КТ-5 з Loom-посиланням |
+| 📋 | Loom-відео | ✅ Записано Аліна (баланс: Аліна 3 / Юлія 2 → на КТ-6 записує Юлія) |
+| 📋 | Тема зареєстрована в Issue | ✅ |
+| 🔧 | check_game_over (перевірка сусідніх рівних плиток) | ✅ logic.asm — copy_boards → slide всі 4 напрямки → пошук 0 → відновлення дошки; збереження/відновлення score (~40 рядків) |
+| 🔧 | check_win (пошук плитки 2048, підтримка продовження гри) | ✅ logic.asm — check_if_have_2024 для prevboard і board; win тільки якщо плитка нова (~30 рядків) |
+| 🔧 | Визначення порожнього ходу (порівняння поля до/після зсуву) | ✅ main.asm — prevboard_eq_board → slide → compare_boards → умовний spawn_tile |
+| 🔧 | draw_game_over та draw_win | ✅ render.asm — червоне вікно 23x7 "GAME OVER" зі score; зелене 23x7 "YOU WON" (~260 рядків) |
+| 🔧 | Підрахунок рахунку (curr_score, best_score) | ✅ logic.asm — merge_row: get_num → add curr_score; cmp → update best_score. draw_score викликається після кожного ходу |
+| 🔧 | README: опис проєкту та аналіз підходів | ✅ README.md — опис гри + аналіз 2 пар підходів (зберігання степеня vs числа; ділення vs таблиця) |
+| 🔒 | Тег КТ-5 підписано | ✅ |
+
+### Внесок по комітах
+
+**Паращій Аліна** (alina8anila) — 18 комітів (з них 1 merge), ~311 рядків коду:
+
+- 4 квіт. 13:09 (3947552) — `feat:implement check_win` — logic.asm: check_win перевірка плитки 11 (2048) (+18/-3)
+- 4 квіт. 13:26 (e6fcc7ee) — `feat: made copy_boards PROC` — logic.asm: copy_boards з параметрами через стек (+27/-1)
+- 4 квіт. 13:45 (729e882) — `feat: made compare_boards PROC` — logic.asm: compare_boards (+35/-1); testlog.asm (+28/-8)
+- 4 квіт. 18:14–18:17 (9679635, 52bcbde) — `feat:implement check_game_over PROC` + merge — logic.asm: check_game_over (copy → slide × 4 → find0 → restore) (+32/-9); merge render.asm (+257/-1)
+- 4 квіт. 18:57 (65aaa72) — `feat: add another check_win` — logic.asm: check_if_have_2024, оновлений check_win з prevboard (+34/-9)
+- 4 квіт. 19:01 (4bd6daef) — `feat: add saveboard for check_game_over` — main.asm (+1/-0)
+- 4 квіт. 19:13 (2f969af) — `feat: add prevboard_eq_board to make main smaller` — logic.asm (+9/-1)
+- 4 квіт. 19:29 (d041706) — `fix: compare_boards` — logic.asm (+1/-1)
+- 4 квіт. 19:33 (35a06d4) — `feat: add empty moves` — main.asm: prevboard → slide → compare → spawn (+12/-0)
+- 5 квіт. 10:01 (04b2f55) — `feat: add score counting` — logic.asm: merge_row з get_num та curr_score/best_score (+31/-0)
+- 5 квіт. 10:06 (02b64b5) — `test: score` — testlog.asm тести рахунку (+46/-31)
+- 5 квіт. 10:09 (839423d) — `feat: call draw_score` — main.asm (+2/-0)
+- 5 квіт. 10:46 (9e95301) — `feat:add best_score counting` — logic.asm: best_score update (+6/-0)
+- 5 квіт. 11:37 (be650eb) — `fix: not change scores in check_game_over` — logic.asm: save/restore score (+6/-0)
+- 5 квіт. 11:47 (4dd457b) — `fix: not to set 0 to game_phase in checks` — logic.asm (+0/-4)
+- 5 квіт. 11:50–11:51 (cff3c12, 6985dde merge) — `feat: add win/lose to the main_loop` — main.asm: win_loop/over_loop (+16/-0)
+- 5 квіт. 12:23 (b6ba81c) — `fix:remove unnecessary code` — main.asm (-16)
+- 5 квіт. 23:13 (13177d0) — `docs: add checkpoint 5` — checkpoints.md (+6/-1)
+
+**Сахарова Юлія** (Julia Sakharova) — 11 комітів (з них 2 merge, 1 test, 2 docs, 3 refactor):
+
+- 3 квіт. 17:57 (9865a2b) — `refactor: make tile positioning dynamic, implement find_start_row and find_start_col PROCS` — render.asm: find_start_row, find_start_col (+48/-7)
+- 3 квіт. 20:14 (c0da2f1) — `refactor: dynamically center text in tiles with padding on both sides` — render.asm (+15/-13)
+- 3 квіт. 22:18 (f8701a1) — `refactor: make draw_board parametrized` — render.asm (+61/-40)
+- 4 квіт. 13:00 (a331e5d) — `feat: implement draw_game_over and draw_win PROCS` — render.asm: два вікна 23x7 (+257/-1)
+- 5 квіт. 10:38 (8691b81) — `fix: change the order of variables for score output` — main.asm (+10/-3)
+- 5 квіт. 10:42 (21252861) — `feat: spawn 2 tiles and add variables` — main.asm (+4/-0)
+- 5 квіт. 10:38–11:41 (48ba291 merge) — Merge branch 'main' — logic.asm (+6/-0)
+- 5 квіт. 10:41 (eddc826) — `test: add tests for draw_game_over and draw_win` — testren.asm (+6/-2)
+- 5 квіт. 11:51 (9ebcc08) — `feat: check game phases` — main.asm: win_loop/over_loop (+30/-3)
+- 5 квіт. 16:04 (8ab8920) — `docs: add analysis of approaches to storing and converting tile values` — README.md (+27/-1)
+- 5 квіт. 17:27 (c5e0c1d) — `docs: add short game description` — README.md (+4/-2)
+
+**Баланс:** Аліна ~18 комітів / ~311 рядків (логіка: check_win, check_game_over, порожній хід, рахунок), Юлія ~11 комітів / ~490 рядків (рендеринг: draw_game_over, draw_win, рефакторинг draw_board + README) — ⚠️ легкий дисбаланс за кількістю комітів, але рядків коду близько; Юлія додала більше рядків через великі процедури draw_game_over/draw_win та рефакторинг
+
+### Якість комітів
+
+✅ **Відповідає вимогам**
+
+- **Conventional Commits:** ~85% — `feat:`, `fix:`, `refactor:`, `docs:`, `test:` використовуються. Кілька merge без префікса (нормально). Аліна пропускає пробіл після двокрапки в деяких комітах (`feat:implement`, `feat:add`)
+- **Imperative mood:** ✅ "implement", "add", "make", "change"
+- **Мова:** ✅ англійська
+- **Гранулярність:** ✅ одна процедура = один коміт: check_win, copy_boards, compare_boards, check_game_over, draw_game_over окремо. Дрібні fix-коміти теж атомарні
+- **GitHub Issues:** ❌ лише Issue #1 (КТ-1), PR workflow відсутній (зауваження з попередніх КТ без змін)
+- **Структура репо:** ✅ src/, .gitignore наявний, бінарні файли відсутні
+
+---
+
 ## КТ-4 (2026-03-29) — ✅ Усі вимоги виконані
 
 ### Рекомендовані оцінки
