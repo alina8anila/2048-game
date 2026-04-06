@@ -100,7 +100,6 @@ jmp main_loop
     ; обробити R
     ; обробити С 
     jmp win_loop
-
     over_loop:
     call draw_game_over
     mov ah, 00h

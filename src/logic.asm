@@ -513,7 +513,7 @@ check_if_have_2024 PROC ; КТ-5
     mov si, [bp+4]   ;board offset
     mov cx, 16
     for_check2024:
-        cmp [si], byte ptr 11 ;11-це 2048
+        cmp [si], byte ptr 7 ;11-це 2048
         je have2024
         inc si
         loop for_check2024
@@ -596,3 +596,26 @@ prevboard_eq_board PROC
     add sp, 4
     ret
     prevboard_eq_board ENDP
+
+reset_gamelog PROC
+    push si
+    push di
+    push cx
+
+    mov curr_score, 0
+    mov game_phase, 0
+    mov si, offset board
+    mov di, offset prevboard
+
+    mov cx, 16
+    for_reset:
+        mov [si], byte ptr 0
+        mov [di], byte ptr 0
+        inc si
+        inc di
+        loop for_reset
+    pop cx
+    pop di
+    pop si
+    ret
+    reset_gamelog ENDP
