@@ -40,7 +40,7 @@ locals @@
     best_msg    DB "Best score: $"    
     BEST_LEN    EQU $-best_msg-1
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
-    win_triger  DB 0.        ;для продовження гри після досягнення 2024
+    win_triger  DB 0         ;для продовження гри після досягнення 2024
 .CODE
 start:
     mov ax, @data
@@ -84,6 +84,9 @@ main_loop:
     cmp ah, 4Dh
     je move_right
 
+    cmp ah, 13h ; R
+    je @restart_game
+
     cmp ah, 01h ; ESC
     je @end
 jmp main_loop
@@ -98,17 +101,31 @@ jmp main_loop
     int 16h
     cmp ah, 01h ; ESC
     je @end
-    ; обробити R
-    ; обробити С 
+    cmp ah, 13h ; R
+    je @restart_game
+    cmp ah, 2Eh ; C
+    je @continue_game
     jmp win_loop
+
     over_loop:
     call draw_game_over
     mov ah, 00h
     int 16h
     cmp ah, 01h ; ESC
     je @end
-    ; обробити R
+    cmp ah, 13h ; R
+    je @restart_game
     jmp over_loop
+    
+    @restart_game:
+    call reset_gamelog
+    jmp start
+
+    @continue_game:
+    mov game_phase, 0
+    call draw_board
+    call draw_score
+    jmp main_loop
 
     move_up:
     call prevboard_eq_board
