@@ -482,7 +482,6 @@ check_game_over PROC ; КТ-5
     check_game_over ENDP
 
 check_win PROC ; КТ-5
-;якщо є плитка 2048, то ax=1, інакше ax=0. Подаємо offset board
     push si
     push cx
 

@@ -40,6 +40,7 @@ locals @@
     best_msg    DB "Best score: $"    
     BEST_LEN    EQU $-best_msg-1
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
+    win_triger  DB 0.        ;для продовження гри після досягнення 2024
 .CODE
 start:
     mov ax, @data
