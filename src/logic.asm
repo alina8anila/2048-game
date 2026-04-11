@@ -582,6 +582,7 @@ reset_gamelog PROC
 
     mov curr_score, 0
     mov game_phase, 0
+    mov win_triger, 0
     mov si, offset board
     mov di, offset prevboard
 

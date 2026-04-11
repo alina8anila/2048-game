@@ -13,26 +13,24 @@ locals @@
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
     row  db 1, 0, 1, 2
     curr_score  DW 0
+    win_triger db 0
+    best_score dw 1
 
 .CODE
 start:
     mov ax, @data
     mov ds, ax
 
-    push offset board
-    call slide_left
-    add sp, 2
-    push offset board
-    call print
-    add sp, 2
+    call check_win
 
-    mov dl, 13
+    mov dl, game_phase
+    add dl, '0'
     mov ah, 02h
     int 21h
 
-    push curr_score
-    call print_score
-    add sp, 2
+    ;push curr_score
+    ;call print_score
+    ;add sp, 2
 
     ;call slide_right
     ;push offset board
