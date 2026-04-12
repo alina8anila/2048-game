@@ -287,6 +287,99 @@ draw_board PROC ; КТ-4
     ret
     draw_board ENDP
 
+print_help_texts PROC
+    push bp
+    mov bp, sp
+    push ax
+    push di
+    push cx
+
+    ; заповнити нижній рядок блакитним кольором для msg
+    mov di, 24*80
+    shl di, 1
+    mov cx, 80
+    @fill_loop:
+    mov ah, 03h
+    mov al, 219
+    mov es:[di], ax
+    add di, 2
+    loop @fill_loop
+
+    ; очистити рядок для hint
+    mov di, 22*80
+    shl di, 1
+    mov cx, 80
+    @clean_loop:
+    mov ax, 0120h
+    mov es:[di], ax
+    add di, 2
+    loop @clean_loop
+
+    ; title
+    cmp game_phase, byte ptr 0
+    je @title_continues
+    push 07h
+    jmp @print_title
+    @title_continues:
+    push 0Eh
+    @print_title:
+    push 2
+    mov ax, 80
+    sub ax, TITLE_LEN
+    shr ax, 1
+    push ax     ; (80-TITLE_LEN)/2
+    push offset game_title
+    call print_line
+    add sp, 8
+
+    ; msg
+    xor ax, ax
+    mov al, game_phase
+    shl ax, 1
+    mov si, offset msg_table
+    add si, ax
+    push 30h
+    push 24
+    push 1
+    push [si]
+    call print_line
+    add sp, 8
+
+    ; HINT
+    xor ax, ax
+    mov al, game_phase
+    shl ax, 1
+    mov si, offset hint_table
+    add si, ax
+    mov di, offset HINT_LENS
+    add di, ax
+    cmp game_phase, byte ptr 0
+    je @hint_continues
+    cmp game_phase, byte ptr 1
+    je @hint_win
+    push 0Ch
+    jmp @print_hint
+    @hint_continues:
+    push 0Fh
+    jmp @print_hint
+    @hint_win:
+    push 0Ah
+    @print_hint:
+    push 22
+    mov ax, 80
+    sub ax, [di]
+    shr ax, 1
+    push ax
+    push [si]
+    call print_line
+    add sp, 8
+
+    pop cx
+    pop di
+    pop ax
+    pop bp
+    ret
+print_help_texts ENDP
 print_line PROC
 ; вивести null-terminated рядок тексту за позицією
     push bp

@@ -22,13 +22,18 @@ locals @@
                 DB 02h  ; зелений
                 DB 0Ah  ; яскраво-зелений   2¹¹=2048
     buffer      DB 8 DUP(0)       ; для збереження рядка
-    title       DB "2048$"
+    game_title       DB "2 0 4 8$"
+    TITLE_LEN   EQU $-game_title
     g_over      DB "G A M E   O V E R$"
     g_win       DB "Y O U   W O N$"
     hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
+    HINT_0_LEN  EQU $-hint_0
     hint_1      DB "Press C to continue, R to restart or ESC to quit$"
+    HINT_1_LEN  EQU $-hint_1
     hint_2      DB "Press R to restart or ESC to quit$"
+    HINT_2_LEN  EQU $-hint_2
     hint_table  DW offset hint_0, offset hint_1, offset hint_2 ; таблиця повідомлень з підказками щодо клавіш
+    HINT_LENS   DW offset HINT_0_LEN, offset HINT_1_LEN, offset HINT_2_LEN
     msg_0       DB "Join equal numbers and get to the 2048 tile!$"
     msg_1       DB "You've reached 2048!$"
     msg_2       DB "No more moves!$"
@@ -56,6 +61,7 @@ start:
     call spawn_tile
     call spawn_tile
     call draw_board
+    call print_help_texts
     call draw_score
     jmp main_loop
 
@@ -97,6 +103,7 @@ jmp main_loop
 
     win_loop:
     call draw_win
+    call print_help_texts
     mov ah, 00h
     int 16h
     cmp ah, 01h ; ESC
@@ -109,6 +116,7 @@ jmp main_loop
 
     over_loop:
     call draw_game_over
+    call print_help_texts
     mov ah, 00h
     int 16h
     cmp ah, 01h ; ESC
@@ -124,6 +132,7 @@ jmp main_loop
     @continue_game:
     mov game_phase, 0
     call draw_board
+    call print_help_texts
     call draw_score
     jmp main_loop
 
@@ -157,6 +166,7 @@ jmp main_loop
     call spawn_tile
     skip_spawn:
     call draw_board
+    call print_help_texts
     call draw_score
     jmp main_loop
 
