@@ -38,7 +38,9 @@ compress_row PROC ; КТ-3
     
     mov si, [bp+4]   ;board offset
     mov bx, si
-    add bx, 4        ;bx-end
+    xor ax, ax
+    mov al, board_type
+    add bx, ax        ;bx-end offset+board_type
 
     go_si:
         cmp [si], byte ptr 0
@@ -83,7 +85,10 @@ merge_row PROC ; КТ-3
     
     mov si, [bp+4]   ;board offset
     mov bx, si
-    add bx, 3        ;bx-end, 3 because we have to be able to get to [si+1]
+    xor ax, ax
+    mov al, board_type
+    dec ax
+    add bx, ax        ;bx-end, 3 because we have to be able to get to [si+1] (board_type-1)
 
     formerge:
         cmp [si], byte ptr 0
@@ -129,13 +134,17 @@ slide_left PROC ; КТ-4
 
     mov bx, offset board
     mov si, offset row
-    mov cx, 4
+    xor ax, ax
+    mov al, board_type
+    mov cx, ax ;cx=board_type
     @@for_sl:
         ;set row from board
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
         @@set_row:
             mov al, [bx]
             mov [si], al
@@ -156,7 +165,9 @@ slide_left PROC ; КТ-4
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board 
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
         @@set_board:
         mov al, [si]
             mov [bx], al
@@ -166,8 +177,9 @@ slide_left PROC ; КТ-4
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
         pop cx  ;restore cx for for_sl
-    
-        add bx, 4 ;go to next row in board
+        xor ax, ax
+        mov al, board_type
+        add bx, ax ;go to next row in board (bx+=board_type)
     loop @@for_sl
 
     pop ax
@@ -186,14 +198,19 @@ slide_right PROC ; КТ-4
     
     mov bx, offset board
     mov si, offset row
-    mov cx, 4
+    xor ax, ax
+    mov al, board_type
+    mov cx, ax ;cx=board_type
     @@for_sl:
         ;set row from board
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        add bx, 3 ;bx-end of row in board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
+        dec ax
+        add bx, ax ;bx=end of row in board (board_type-1)
         @@set_row:
             mov al, [bx]
             mov [si], al
@@ -214,8 +231,11 @@ slide_right PROC ; КТ-4
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board 
-        add bx, 3 ;bx-end of row in board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
+        dec ax
+        add bx, ax ;bx=end of row in board (board_type-1)
         @@set_board:
         mov al, [si]
             mov [bx], al
@@ -225,8 +245,9 @@ slide_right PROC ; КТ-4
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
         pop cx  ;restore cx for for_sl
-    
-        add bx, 4 ;go to next row in board
+        xor ax, ax
+        mov al, board_type
+        add bx, ax ;go to next row in board (add board_type)
     loop @@for_sl
 
     pop ax
@@ -245,18 +266,24 @@ slide_up PROC ; КТ-4
     
     mov bx, offset board
     mov si, offset row
-    mov cx, 4
+    xor ax, ax
+    mov al, board_type
+    mov cx, ax ;cx=board_type
     @@for_sl:
         ;set row from board
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
         @@set_row:
             mov al, [bx]
             mov [si], al
             inc si
-            add bx, 4 ;jump to next row in board
+            xor ax, ax
+            mov al, board_type
+            add bx, ax ;jump to next row in board (add board_type)
         loop @@set_row
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
@@ -272,12 +299,16 @@ slide_up PROC ; КТ-4
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board 
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
         @@set_board:
         mov al, [si]
             mov [bx], al
             inc si
-            add bx, 4 ;jump to next row in board
+            xor ax, ax
+            mov al, board_type
+            add bx, ax ;jump to next row in board (add board_type)
         loop @@set_board
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
@@ -301,19 +332,28 @@ push si
     
     mov bx, offset board
     mov si, offset row
-    mov cx, 4
+    xor ax, ax
+    mov al, board_type
+    mov cx, ax ;cx=board_type
     @@for_sl:
         ;set row from board
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        add bx, 12 ;go to last row on board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
+        ;make ax=board_type*board_type-board_type
+        mul board_type
+        sub al, board_type
+        add bx, ax ;go to last row on board (board_type*board_type-board_type)
         @@set_row:
             mov al, [bx]
             mov [si], al
             inc si
-            sub bx, 4 ;jump to next row in board
+            xor ax, ax
+            mov al, board_type
+            sub bx, ax ;jump to next row in board (sub board_type)
         loop @@set_row
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
@@ -329,13 +369,20 @@ push si
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        add bx, 12 ;go to last row on board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax ;cx=board_type
+        ;make ax=board_type*board_type-board_type
+        mul board_type
+        sub al, board_type
+        add bx, ax ;go to last row on board (board_type*board_type-board_type)
         @@set_board:
         mov al, [si]
             mov [bx], al
             inc si
-            sub bx, 4 ;jump to next row in board
+            xor ax, ax
+            mov al, board_type
+            sub bx, ax ;jump to next row in board (sub board_type)
         loop @@set_board
         pop bx  ;restore offset of board
         pop si  ;restore offset of row
@@ -360,7 +407,10 @@ spawn_tile PROC ; КТ-4
     push ax
 
     xor bx, bx
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     mov si, offset board
 
     push si ;save offset of board
@@ -391,8 +441,13 @@ spawn_tile PROC ; КТ-4
     mov ax, 2
     notset_ax2:
 
+    push ax ;save ax
     inc bx
-    mov cx, 16
+    or ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
+    pop ax ;restpre ax
     for_count02:
         cmp [si], byte ptr 0
         jne @@skip2
@@ -461,7 +516,10 @@ check_game_over PROC ; КТ-5
     pop curr_score
 
     mov si, offset board
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     find0:
         cmp [si], byte ptr 0
         je notover ;if([si]==0) -> notover
@@ -489,7 +547,10 @@ check_win PROC ; КТ-5
     je end_check2024
 
     mov si, offset board
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     for_check2024:
         cmp [si], byte ptr 11 ;11-це 2048
         je have2024
@@ -518,7 +579,10 @@ copy_boards PROC
     mov di, [bp+6] ;to this board
     mov si, [bp+4] ;form this board
 
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     for_copy:
         mov al, [si]
         mov [di], al
@@ -544,7 +608,10 @@ compare_boards PROC
     mov di, [bp+6] ;fir
     mov si, [bp+4] ;sec
 
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     for_compare:
         mov al, [si]
         cmp [di], al
@@ -586,7 +653,10 @@ reset_gamelog PROC
     mov si, offset board
     mov di, offset prevboard
 
-    mov cx, 16
+    xor ax, ax
+    mov al, board_type
+    mul board_type
+    mov cx, ax ;cx=board_type*board_type
     for_reset:
         mov [si], byte ptr 0
         mov [di], byte ptr 0
