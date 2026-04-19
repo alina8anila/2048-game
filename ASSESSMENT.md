@@ -11,6 +11,106 @@
 
 ---
 
+## КТ-6 (2026-04-12) — ✅ Усі вимоги виконані
+
+### Рекомендовані оцінки
+
+📹 [Loom](https://www.loom.com/share/6248c9cfb5314c8c9424245f81e4b02e) (Юлія, ~1.5 хв) — баланс відео: Аліна 3 / Юлія 3 → вирівняно. На КТ-7 план теми вимагає ІНДИВІДУАЛЬНИХ відео від кожної
+
+📊 Прогрес: ~95% (очікувано ~86% на КТ-6) — **проєкт фактично завершено**. Гра повністю грабельна: ініціалізація → ігровий цикл → win/over екрани → restart (R) / continue (C). Усі основні пункти КТ-6 виконано
+
+**Залишилось до 100% (КТ-7):**
+- Завершити аналіз алгоритму зсуву A vs B у README (Аліна) — розділ «стиснення-потім-злиття vs злиття-під-час-зсуву» є у README з чернетки, але без тексту під «Чому?» та «Зауваження»
+- Доповнити README діаграмою пам'яті (Юлія) — чернетка вже є (board/tile_colors/msg_table/hint_table/curr_score/best_score/game_phase), уточнити зсуви/довжини і довести до фінального вигляду
+- Фінальне тестування граничних випадків: `[2,2,2,2]→[4,4,0,0]`, переповнення рахунку (DW → 65535), restart/continue через усі game_phase
+- Закрити вивід інструкції `Q: quit` або узгодити з фактичними клавішами (ESC vs Q) — `hint_0`/`hint_1`/`hint_2` пишуть `ESC: quit`, але в темі згадується ESC/R — перевірити консистентність
+- Фінальне полірування README: текст під «Чому?» для підходу 3, англомовні коментарі (частина коментарів у `logic.asm`/`main.asm` — укр)
+
+> ⚠️ **КТ-7 відео — потрібні ДВА окремі індивідуальні Loom-відео**, по одному від кожної студентки (це вимога плану теми на тиждень 14). Одне спільне відео НЕ зараховується:
+> - **Аліна** — пояснює свою частину: `check_win` з `win_triger` (продовження гри після 2048), `check_game_over` (copy → slide × 4 → find0 → restore), `reset_gamelog` (скидання board/prevboard/curr_score/game_phase/win_triger), `compress_row`/`merge_row`, `compare_boards`/`prevboard_eq_board` для порожнього ходу, підрахунок `curr_score`/`best_score`
+> - **Юлія** — пояснює свою частину: `print_help_texts` з диспетчеризацією title/msg/hint через `game_phase` і `msg_table`/`hint_table`, `draw_board`/`draw_tile` у B800h, `draw_score`, `draw_win`/`draw_game_over`, обробка R (restart) та C (continue) у `win_loop`/`over_loop`
+
+| Студент | Відео (0/5) | Код (0–5) | Коментар |
+|---------|:-----------:|:---------:|----------|
+| Паращій Аліна | 5 | 5 | Чудова робота. На КТ-7 обов'язково запишіть СВОЄ окреме відео. Деталі в ASSESSMENT.md у репо |
+| Сахарова Юлія | 5 | 5 | Відмінна робота на КТ-6. На КТ-7 обов'язково запишіть СВОЄ окреме відео. Деталі в ASSESSMENT.md у репо |
+
+### Детальні коментарі
+
+**Паращій Аліна** — Чудова робота. Рефакторинг check_win зі зрозумілим `win_triger`, фікс циклу після перемоги, reset_gamelog. Гра тепер повністю грабельна, можна продовжити після 2048. Додана чернетка аналізу алгоритму зсуву у README. **На КТ-7 обов'язково запишіть СВОЄ окреме відео**: check_win/win_triger, reset_gamelog, check_game_over
+
+**Сахарова Юлія** — Відмінна робота на КТ-6. print_help_texts з диспетчеризацією title/msg/hint через game_phase + таблиці, обробка R/C для restart/continue, опис пам'яті та діаграма даних у README. Запис відео, баланс вирівняно 3/3. **На КТ-7 обов'язково запишіть СВОЄ окреме відео**: print_help_texts, win_loop/over_loop, draw_win/draw_game_over
+
+### Аналіз Loom-відео
+
+**Записано:** Сахарова Юлія (~1.5 хв)
+
+| Критерій | Оцінка | Деталі |
+|----------|:------:|--------|
+| Технічне розуміння | ✅ Добре | Пояснено `print_help_texts` (title/hint/message через таблиці), обробку R/C у очікуванні клавіш для restart/continue, фікс Аліни у `reset_gamelog` (win зациклювалось через невідновлення `win_triger`). Живе демо: досягнення плитки 2048 → зелене повідомлення → C → продовження гри → game over → червоне повідомлення |
+| Ownership та залученість | ✅ Обидві залучені | Юлія чітко розмежовує свою частину (`print_help_texts`, очікування клавіш) та роботу Аліни (фікс `reset_gamelog`, аналіз алгоритму зсуву в README). Знає, що саме партнерка виправила і чому |
+| Когерентність з кодом | ✅ Повна | Усе підтверджується: `print_help_texts` у `render.asm:290` з диспетчеризацією по `game_phase`, `win_loop`/`over_loop` у `main.asm:104-126` з обробкою R/C/ESC, `reset_gamelog` у `logic.asm:578` скидає `win_triger`, live demo win→continue→game over |
+| Якість комунікації | ✅ Добра | Коротке але щільне відео (~1.5 хв), логічна структура: що нового → фікс партнерки → демо win/continue/over → README. По суті, без філерів |
+| 🚩 Червоні прапорці | ✅ Немає | Коротке відео виправдане — КТ-6 це полірування вже готової гри. Обидві студентки активні, код відповідає опису |
+
+### Ключові спостереження
+
+- **Проєкт фактично завершено на КТ-6:** гра повністю грабельна — ініціалізація → main_loop → check_win/check_game_over → win_loop (R/C/ESC) / over_loop (R/ESC) → restart через `reset_gamelog` → jmp start. Continue після перемоги через `win_triger` працює коректно
+- **Юлія — `print_help_texts` як єдина точка виведення UI-текстів:** `render.asm:290` — диспетчеризація title/msg/hint за `game_phase` через `msg_table`/`hint_table` (DW offsets), різні кольори для кожної фази (0Eh/07h title, 0Fh/0Ch/0Ah hint). Елегантно — замість дублювання в кожному loop
+- **Аліна — фікс логіки перемоги:** `check_win` тепер використовує `win_triger DB 0` (`main.asm:48`), що дозволяє продовжити гру після досягнення 2048 (continue в `win_loop` → `game_phase=0`, але `win_triger=1` запобігає повторному виклику win screen). `reset_gamelog` скидає і `win_triger`, і `curr_score`, і обидва `board`/`prevboard`
+- **README: чернетки аналізу A-vs-B та діаграми пам'яті є, але не завершені:** розділ «Алгоритм зсуву» має A/B опис, але порожні «Чому?» та «Зауваження». Діаграма даних є (board/tile_colors/msg_table/hint_table/curr/best_score/game_phase), треба фіналізувати до КТ-7
+- **Issues використовуються:** PR #2 (key waiting) і PR #3 (print_help_texts) через feature branch + merge, закриті. Це зразкова практика — перший раз бачимо PR у цьому проєкті
+
+### Чеклист
+
+| | Перевірка | Статус |
+|---|-----------|--------|
+| 📋 | checkpoints.md + секція КТ-6 | ✅ Записано з Loom-посиланням |
+| 📋 | Loom-відео | ✅ Записано Юлія (~1.5 хв). Баланс: Аліна 3 / Юлія 3 → вирівняно |
+| 🔧 | Граничні випадки `[2,2,2,2]→[4,4,0,0]` | ⚠️ `compress_row`+`merge_row` логіка є, окремий тест у `testlog.asm` не додано на КТ-6, фінальне тестування на КТ-7 |
+| 🔧 | Перезапуск гри (скидання board та score) — Аліна | ✅ `reset_gamelog` у `logic.asm:578` скидає `curr_score`, `game_phase`, `win_triger`, `board`, `prevboard` |
+| 🔧 | Чернетка аналізу A-vs-B (алгоритм зсуву) — Аліна | ⚠️ Розділ «Алгоритм зсуву: стиснення-потім-злиття проти злиття-під-час-зсуву» є в README, але «Чому?» та «Зауваження» порожні |
+| 🔧 | Обробка R/C для restart/continue — Юлія | ✅ `main.asm:104-137` — `win_loop` (R=restart, C=continue), `over_loop` (R=restart), `@continue_game` скидає `game_phase=0` але зберігає `win_triger=1` |
+| 🔧 | `print_help_texts` для всіх фаз — Юлія | ✅ `render.asm:290` — title/msg/hint через `game_phase` + таблиці `msg_table`/`hint_table` |
+| 🔧 | Діаграма пам'яті у README — Юлія | ✅ Чернетка додана (board, tile_colors, msg_table/hint_table, curr/best_score, game_phase), фіналізувати на КТ-7 |
+| 🔒 | Тег КТ-6 підписано | ✅ 13 студентських комітів у вікні (1 зовнішній — sergemedvid КТ-5 assessment) |
+
+### Внесок по комітах
+
+**Паращій Аліна** (alina8anila) — 6 комітів (4 feat/fix/refactor + 1 docs + 1 merge), ~50 рядків нового коду:
+
+- 6 квіт. 00:50 — `feat: implement reset_gamelog PROC` (`logic.asm` +25/-2, `main.asm` +0/-1) — скидання board/prevboard/curr_score/game_phase/win_triger
+- 7 квіт. 00:50 — Merge branch 'main' (ASSESSMENT.md +100) — мерж попереднього асесменту
+- 11 квіт. 16:48 — `refactor: made check_win more simple` (`logic.asm` +8/-29) — спрощення `check_win` через `win_triger`
+- 11 квіт. 16:49 — `feat: add win_triger to main` (`logic.asm` +0/-1, `main.asm` +1/-0) — додано прапорець до `.DATA`
+- 11 квіт. 16:51 — `fix: win_triger in reset_gamelog` (`logic.asm` +1/-0, `testlog.asm` +8/-10) — фікс циклу win
+- 12 квіт. 22:00 — `docs: add draft of slides analysis` (`README.md` +7/-0) — чернетка аналізу алгоритму зсуву
+
+**Сахарова Юлія** (Juli-s07 / Julia Sakharova) — 6 комітів (3 feat + 2 docs + 2 merge, 1 merge перекривається), ~155 рядків нового коду:
+
+- 11 квіт. 17:15 — `feature: add key waiting to restart and continue` (`main.asm` +21/-4) — R/C обробка в `win_loop`/`over_loop` (через feature/render branch)
+- 11 квіт. 17:24 — Merge PR #2 from feature/render (`main.asm` +21/-4)
+- 12 квіт. 17:21 — `feature: implement print_help_texts PROC for all game phases and add variables in main` (`main.asm` +11/-1, `render.asm` +93/-0) — `print_help_texts` з таблицями
+- 12 квіт. 17:32 — Merge PR #3 from feature/render (`main.asm` +11/-1, `render.asm` +93/-0)
+- 12 квіт. 21:16 — `docs: add memory diagram draft` (`README.md` +22/-1) — діаграма даних
+- 12 квіт. 21:33 — `docs: add memory description` (`README.md` +7/-1) — опис організації пам'яті
+- 12 квіт. 22:28 — `docs: add checkpoint 6` (`checkpoints.md` +6/-1) — секція КТ-6 з Loom
+
+**Баланс:** комітів 6/6, нового коду ~50/~155 рядків — ✅ збалансовано за кількістю комітів. Юлія додала більше рядків через велику процедуру `print_help_texts` (+93) та розширений README. Обидві виконали свої частини плану КТ-6. Відеобаланс 3/3 — вирівняно
+
+### Якість комітів
+
+✅ **Відповідає вимогам**
+
+- **Conventional Commits:** 100% з префіксом (`feat:`, `fix:`, `refactor:`, `docs:`, `feature:`). Дрібне зауваження: Юлія використала `feature:` замість канонічного `feat:` — допустима варіація, але варто уніфікувати
+- **Imperative mood:** ✅ ("implement", "add", "made", "fix")
+- **Мова:** англійська ✅ (повідомлення комітів)
+- **Гранулярність:** ✅ добра — кожен коміт один логічний крок (окремо `reset_gamelog`, окремо `win_triger`, окремо фікс, окремо `print_help_texts`, окремо docs)
+- **GitHub Issues / PR:** ✅ **Вперше використано PR** — PR #2 (key waiting), PR #3 (print_help_texts) через `feature/render` branch. Це зразкова практика на КТ-6, раніше було лише direct push
+- **Структура репо:** ✅ `src/` з 5 модулями (`main.asm`/`logic.asm`/`render.asm`/`testlog.asm`/`testren.asm`), `README.md`, `checkpoints.md`. Без dev-артефактів
+
+---
+
 ## КТ-5 (2026-04-05) — ✅ Усі вимоги виконані
 
 ### Рекомендовані оцінки
