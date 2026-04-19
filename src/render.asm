@@ -315,7 +315,7 @@ print_help_texts PROC
     loop @fill_loop
 
     ; очистити рядок для hint
-    mov di, 22*80
+    mov di, 23*80
     shl di, 1
     mov cx, 80
     @clean_loop:
