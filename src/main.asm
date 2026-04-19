@@ -3,10 +3,11 @@
 locals @@
 
 .DATA
-    row         DB 0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
-    board       DB 16 DUP(0) ;Підхід B: Зберігати показник степеня
-    saveboard   DB 16 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
-    prevboard   DB 16 DUP(0)
+    row         DB 0,0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
+    board       DB 25 DUP(0) ;Підхід B: Зберігати показник степеня
+    saveboard   DB 25 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
+    prevboard   DB 25 DUP(0)
+    board_type  EQU 5
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
     tile_colors DB 00h  ; чорний            пуста клітинка
@@ -22,7 +23,7 @@ locals @@
                 DB 02h  ; зелений
                 DB 0Ah  ; яскраво-зелений   2¹¹=2048
     buffer      DB 8 DUP(0)       ; для збереження рядка
-    game_title       DB "2 0 4 8$"
+    game_title  DB "2 0 4 8$"
     TITLE_LEN   EQU $-game_title
     g_over      DB "G A M E   O V E R$"
     g_win       DB "Y O U   W O N$"
@@ -46,8 +47,13 @@ locals @@
     BEST_LEN    EQU $-best_msg-1
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
     win_triger  DB 0         ;для продовження гри після досягнення 2024
+    filename    DB "best.txt", 0
+    file_handle DW 0
 .CODE
 start:
+    call from_file
+    after_file_reading:
+
     mov ax, @data
     mov ds, ax
 
@@ -127,7 +133,7 @@ jmp main_loop
     
     @restart_game:
     call reset_gamelog
-    jmp start
+    jmp after_file_reading
 
     @continue_game:
     mov game_phase, 0
