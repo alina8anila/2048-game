@@ -615,6 +615,14 @@ prevboard_eq_board PROC
     ret
     prevboard_eq_board ENDP
 
+Zboard_eq_prevboard PROC
+    push offset Zboard
+    push offset prevboard
+    call copy_boards
+    add sp, 4
+    ret
+    Zboard_eq_prevboard ENDP
+
 reset_gamelog PROC
     push si
     push di
@@ -639,9 +647,10 @@ reset_gamelog PROC
     ret
     reset_gamelog ENDP
 
+
 ctrZ PROC
     push offset board
-    push offset prevboard
+    push offset Zboard
     call copy_boards
     add sp, 4
     ret
