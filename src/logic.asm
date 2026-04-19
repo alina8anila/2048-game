@@ -28,7 +28,7 @@ get_num PROC
     get_num ENDP
 
 compress_row PROC ; КТ-3
-; збір ненульових плиток (для slide_left)
+; collecting non-zero tiles (для slide_left)
     push bp
     mov bp, sp
     push bx
@@ -76,7 +76,7 @@ compress_row PROC ; КТ-3
     compress_row ENDP
 
 merge_row PROC ; КТ-3
-; злиття сусідніх рівних (для slide_left)
+; merging neighboring same tiles (для slide_left)
     push bp
     mov bp, sp
     push bx
@@ -126,7 +126,7 @@ merge_row PROC ; КТ-3
     merge_row ENDP
 
 slide_left PROC ; КТ-4
-; зсув ліворуч (Підхід A)
+; slide left (approach A)
     push si
     push cx
     push bx
@@ -190,7 +190,7 @@ slide_left PROC ; КТ-4
     slide_left ENDP
 
 slide_right PROC ; КТ-4
-; зсув праворуч
+; slide right
     push si
     push cx
     push bx
@@ -258,7 +258,7 @@ slide_right PROC ; КТ-4
     slide_right ENDP
 
 slide_up PROC ; КТ-4
-; зсув вверх
+;  slide up
     push si
     push cx
     push bx
@@ -390,7 +390,7 @@ push si
     slide_down ENDP
 
 spawn_tile PROC ; КТ-4
-; в рандомному пустому місці ставить плитку 2 або 4
+; in a random empty place put 2 або 4
     push cx
     push bx
     push si
@@ -414,11 +414,11 @@ spawn_tile PROC ; КТ-4
     push bx
     call random_range 
     add sp, 2
-    mov bx, ax      ;bx=випадкове число 0..bx-1
+    mov bx, ax      ;bx=random number 0..bx-1
 
     mov ax, 10
     push ax
-    call random_range ;ax=випадкове число 0..9
+    call random_range ;ax=random number 0..9
     add sp, 2
 
     cmp ax, 0
@@ -459,18 +459,18 @@ random_range PROC
     push cx
     push dx
     
-    mov ah, 00h ; Отримуємо число з системного таймера (кількість тіків)
-    int 1ah             ; cx:dx = кількість тіків з опівночі
+    mov ah, 00h ; get a number from the system timer (number of ticks)
+    int 1ah             ; cx:dx = number of ticks since midnight
     ; seed = (seed * 25173 + 13849) AND FFFFh
-    mov ax, dx          ; dx-початкове seed
+    mov ax, dx          ; dx-initial seed
     mov cx, 25173
     mul cx              ; ax=seed*25173
     add ax, 13849       ; ax=seed*25173+13849
     
-    mov bx, [bp+4]      ; діапазон
+    mov bx, [bp+4]    
     xor dx, dx          
-    div bx              ; ax/bx, остача в dx
-    mov ax, dx          ; ax=випадкове число 0..bx-1
+    div bx              ; ax/bx, remainder в dx
+    mov ax, dx          ; ax=ramdom number 0..bx-1
     
     pop dx
     pop cx
@@ -480,7 +480,7 @@ random_range PROC
     random_range ENDP
 
 check_game_over PROC ; КТ-5
-; перевірка сусідніх рівних плиток
+; looks if it posible to make a move
     push si
     push cx
 
@@ -531,7 +531,7 @@ check_win PROC ; КТ-5
     mov si, offset board
     mov cx, board_type*board_type ;cx=board_type*board_type
     for_check2024:
-        cmp [si], byte ptr 11 ;11-це 2048
+        cmp [si], byte ptr 11 ;11-is 2048
         je have2024
         inc si
         loop for_check2024
