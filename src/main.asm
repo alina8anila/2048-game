@@ -96,6 +96,9 @@ main_loop:
 
     cmp ah, 01h ; ESC
     je @end
+
+    cmp ah, 2Ch ; Z
+    je do_ctrZ
 jmp main_loop
 
     @end:
@@ -129,6 +132,10 @@ jmp main_loop
     @restart_game:
     call reset_gamelog
     jmp start
+
+    do_ctrZ:
+    call ctrZ
+    jmp @continue_game
 
     @continue_game:
     mov game_phase, 0
