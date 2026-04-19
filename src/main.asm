@@ -7,6 +7,7 @@ locals @@
     board       DB 25 DUP(0) ;Підхід B: Зберігати показник степеня
     saveboard   DB 25 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
     prevboard   DB 25 DUP(0)
+    Zboard      DB 25 DUP(0) ;для ctrZ
     prevscore   DW 0         ;для ctrZ
     prevbscore  DW 0         ;для ctrZ
     board_type  EQU 4
@@ -66,6 +67,8 @@ start:
     call draw_board
     call print_help_texts
     call draw_score
+    call prevboard_eq_board
+    call Zboard_eq_prevboard
     jmp main_loop
 
 main_loop:
@@ -173,6 +176,7 @@ jmp main_loop
     add sp, 4
     cmp ax, 1           ;if(board==prevboard) don't spawn tile
     je skip_spawn
+    call Zboard_eq_prevboard ;if(not emty move) Zboard=prevboard
     call spawn_tile
     skip_spawn:
     call draw_board
