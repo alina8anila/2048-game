@@ -340,6 +340,7 @@ push si
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
+        mov cx, board_type ;cx=board_type
         add bx, board_type*board_type-board_type ;go to last row on board (board_type*board_type-board_type)
         @@set_row:
             mov al, [bx]
@@ -364,6 +365,7 @@ push si
         push si ;save offset of row
         push bx ;save offset of board
 
+        mov cx, board_type ;cx=board_type
         add bx, board_type*board_type-board_type ;go to last row on board (board_type*board_type-board_type)
         @@set_board:
         mov al, [si]
