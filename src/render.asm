@@ -33,10 +33,12 @@ draw_board PROC ; КТ-4
 
     ; ------- горизонтальні лінії -------
     ; скільки стовпців треба пройти (без кутових)
-    mov cx, TILE_WIDTH
-    inc cx
-    shl cx, 2
-    dec cx
+    mov ax, TILE_WIDTH
+    inc ax
+    mov bx, board_type
+    mul bx
+    dec ax
+    mov cx, ax
 
     call find_start_col
     mov bx, dx  ; start_col
@@ -80,7 +82,8 @@ draw_board PROC ; КТ-4
     mov dx, ax  ; offset по рядкам
     add di, dx  ; перейти до наступного горизонтального рядка
     
-    mov cx, 3
+    mov cx, board_type
+    dec cx
         @single_hor:
         mov ah, 0Fh
         mov al, 196     ; ─ 196
@@ -107,7 +110,8 @@ draw_board PROC ; КТ-4
     mov dx, ax
     add di, dx  ; перейти до наступного горизонтального рядка
     
-    mov cx, 3
+    mov cx, board_type
+    dec cx
         @single_lines_b:
         mov ah, 0Fh
         mov al, 197     ; ┼ 197
@@ -130,10 +134,12 @@ draw_board PROC ; КТ-4
 
     ; ------- вертикальні лінії -------
     ; скільки рядків треба пройти (без кутових)
-    mov cx, TILE_HEIGHT
-    inc cx
-    shl cx, 2
-    dec cx
+    mov ax, TILE_HEIGHT
+    inc ax
+    mov bx, board_type
+    mul bx
+    dec ax
+    mov cx, ax
 
     call find_start_row
     mov si, dx
@@ -174,7 +180,8 @@ draw_board PROC ; КТ-4
     shl dx, 1   ; offset по стовпцям
     add di, dx  ; перейти до наступної вертикалі 
     
-    mov cx, 3
+    mov cx, BOARD_TYPE
+    dec cx
         @single_vert:
         mov ah, 0Fh
         mov al, 179     ; │ 179
@@ -195,7 +202,7 @@ draw_board PROC ; КТ-4
 
     mov ax, TILE_WIDTH
     inc ax
-    mov dx, 4
+    mov dx, board_type
     mul dx
     shl ax, 1
     mov dx, ax
@@ -232,7 +239,8 @@ draw_board PROC ; КТ-4
 
     mov ax, TILE_WIDTH
     inc ax
-    shl ax, 2
+    mov bx, board_type
+    mul bx
     shl ax, 1
     mov cx, ax  ; крок крайніми стовпцями рамки
     add di, cx
@@ -244,7 +252,8 @@ draw_board PROC ; КТ-4
     pop di
     mov ax, TILE_HEIGHT
     inc ax
-    shl ax, 2
+    mov bx, board_type
+    mul bx
     mov bx, 80
     mul bx
     shl ax, 1
@@ -260,11 +269,11 @@ draw_board PROC ; КТ-4
     mov al, 188     ; ╝ 188
     mov es:[di], ax
 
-        mov cx, 4
+        mov cx, board_type
         xor ax, ax
         rows:
         push cx
-        mov cx, 4
+        mov cx, board_type
         xor bx, bx
             columns:
             push ax
@@ -323,7 +332,7 @@ print_help_texts PROC
     @title_continues:
     push 0Eh
     @print_title:
-    push 2
+    push 1
     mov ax, 80
     sub ax, TITLE_LEN
     shr ax, 1
@@ -365,7 +374,7 @@ print_help_texts PROC
     @hint_win:
     push 0Ah
     @print_hint:
-    push 22
+    push 23
     mov ax, 80
     sub ax, [di]
     shr ax, 1
@@ -422,18 +431,25 @@ print_line PROC
 find_start_row PROC
     push bp
     mov bp, sp
+    push ax
     push bx
-    ; start_row = (25 - (4 * TILE_HEIGHT + 3)) / 2
+    push cx
+    ; start_row = (25 - (board_type * (TILE_HEIGHT + 1) - 1)) / 2
     ; повернути в dx
 
-    mov dx, 25
-    mov bx, TILE_HEIGHT
-    shl bx, 2
-    add bx, 3
-    sub dx, bx
-    shr dx, 1
+    mov cx, 25
+    mov ax, TILE_HEIGHT
+    inc ax
+    mov bx, board_type
+    mul bx
+    dec ax
+    sub cx, ax
+    shr cx, 1
+    mov dx, cx
 
+    pop cx
     pop bx
+    pop ax
     pop bp
     ret
 find_start_row ENDP
@@ -441,18 +457,25 @@ find_start_row ENDP
 find_start_col PROC
     push bp
     mov bp, sp
+    push ax
     push bx
-    ; start_col = (80 - (4 * TILE_WIDTH + 3)) / 2
+    push cx
+    ; start_col = (80 - (board_type * (TILE_WIDTH + 1) - 1)) / 2
     ; повернути в dx
 
-    mov dx, 80
-    mov bx, TILE_WIDTH
-    shl bx, 2
-    add bx, 3
-    sub dx, bx
-    shr dx, 1
+    mov cx, 80
+    mov ax, TILE_WIDTH
+    inc ax
+    mov bx, board_type
+    mul bx
+    dec ax
+    sub cx, ax
+    shr cx, 1
+    mov dx, cx
 
+    pop cx
     pop bx
+    pop ax
     pop bp
     ret
 find_start_col ENDP
@@ -469,9 +492,9 @@ draw_tile PROC ; КТ-3
     push dx
 
     ; [bp+6] - grid_row, [bp+4] - grid_column
-    ; обчислити index для взяття значення: row*4+column
+    ; обчислити index для взяття значення: row*board_type+column
     mov ax, [bp+6]
-    mov bx, 4
+    mov bx, board_type
     mul bx
     add ax, [bp+4]
     mov di, ax    
