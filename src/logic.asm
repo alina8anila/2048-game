@@ -638,3 +638,11 @@ reset_gamelog PROC
     pop si
     ret
     reset_gamelog ENDP
+
+ctrZ PROC
+    push offset board
+    push offset prevboard
+    call copy_boards
+    add sp, 4
+    ret
+    ctrZ ENDP

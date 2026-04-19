@@ -3,53 +3,59 @@
 locals @@
 
 .DATA
-    board   DB 2, 2, 1, 1 
-            DB 1, 3, 3, 1
-            DB 1, 1, 1, 1
-            DB 1, 1, 2, 2
-
-    saveboard DB 16 DUP(0)
-    prevboard DB 16 DUP(0)
+    board       DB 25 DUP(0)
+    board_type DB 5
+    saveboard DB 25 DUP(0)
+    prevboard DB 25 DUP(0)
     game_phase  DB 0         ;0-game is going, 1-win, 2-lose
-    row  db 1, 0, 1, 2
+    row  db 1, 0, 1, 2, 2
     curr_score  DW 0
     win_triger db 0
     best_score dw 1
-
+ 
 .CODE
 start:
     mov ax, @data
     mov ds, ax
 
-    call check_win
-
-    mov dl, game_phase
-    add dl, '0'
+    push offset board
+    call print
+    add sp, 2
     mov ah, 02h
+    mov dl, 10      ; Line Feed
+    int 21h
+    
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+    call spawn_tile
+
+    push offset board
+    call print
+    add sp, 2
+    mov ah, 02h
+    mov dl, 10      ; Line Feed
     int 21h
 
-    ;push curr_score
-    ;call print_score
-    ;add sp, 2
+    call slide_left
+    push offset board
+    call print
+    add sp, 2
+    mov dl, 10      ; Line Feed
+    int 21h
 
-    ;call slide_right
-    ;push offset board
-    ;call print
-    ;add sp, 2
-    ;mov dl, 10      ; Line Feed
-    ;int 21h
-
-    ;call slide_up
-    ;push offset board
-    ;call print
-    ;add sp, 2
-    ;mov dl, 10      ; Line Feed
-    ;int 21h
-
-    ;call slide_down
-    ;push offset board
-    ;call print
-    ;add sp, 2
+    call slide_down
+    push offset board
+    call print
+    add sp, 2
 
 
     mov ah, 4Ch
@@ -64,11 +70,17 @@ start:
         push dx
     
         mov si, [bp+4] ;offset of the board
-        mov cx, 4
+        xor ax, ax
+        mov al, board_type
+        mov cx, ax
 
         mov ah, 02h
         for:
             mov ah, 02h
+            mov dl, [si]
+            add dl, '0'
+            int 21h
+            inc si
             mov dl, [si]
             add dl, '0'
             int 21h
