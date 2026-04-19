@@ -608,10 +608,19 @@ compare_boards PROC
     compare_boards ENDP
 
 prevboard_eq_board PROC
+    push ax
+
+    mov ax, curr_score
+    mov prevscore, ax
+    mov ax, best_score
+    mov prevbscore, ax
+
     push offset prevboard
     push offset board
     call copy_boards
     add sp, 4
+
+    pop ax
     ret
     prevboard_eq_board ENDP
 
@@ -649,9 +658,18 @@ reset_gamelog PROC
 
 
 ctrZ PROC
+    push ax
+
+    mov ax, prevscore
+    mov curr_score, ax
+    mov ax, prevbscore
+    mov best_score, ax
+
     push offset board
     push offset Zboard
     call copy_boards
     add sp, 4
+
+    pop ax
     ret
     ctrZ ENDP
