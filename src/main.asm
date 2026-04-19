@@ -27,7 +27,7 @@ locals @@
     TITLE_LEN   EQU $-game_title
     g_over      DB "G A M E   O V E R$"
     g_win       DB "Y O U   W O N$"
-    hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit$"
+    hint_0      DB "Arrow keys: move tiles     R: restart     ESC: quit     Z: cancel last move$"
     HINT_0_LEN  EQU $-hint_0
     hint_1      DB "Press C to continue, R to restart or ESC to quit$"
     HINT_1_LEN  EQU $-hint_1
