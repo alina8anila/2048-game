@@ -340,13 +340,7 @@ push si
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        xor ax, ax
-        mov al, board_type
-        mov cx, ax ;cx=board_type
-        ;make ax=board_type*board_type-board_type
-        mul board_type
-        sub al, board_type
-        add bx, ax ;go to last row on board (board_type*board_type-board_type)
+        add bx, board_type*board_type-board_type ;go to last row on board (board_type*board_type-board_type)
         @@set_row:
             mov al, [bx]
             mov [si], al
@@ -369,13 +363,8 @@ push si
         push cx ;save cx for for_sl
         push si ;save offset of row
         push bx ;save offset of board
-        xor ax, ax
-        mov al, board_type
-        mov cx, ax ;cx=board_type
-        ;make ax=board_type*board_type-board_type
-        mul board_type
-        sub al, board_type
-        add bx, ax ;go to last row on board (board_type*board_type-board_type)
+
+        add bx, board_type*board_type-board_type ;go to last row on board (board_type*board_type-board_type)
         @@set_board:
         mov al, [si]
             mov [bx], al
@@ -407,10 +396,7 @@ spawn_tile PROC ; КТ-4
     push ax
 
     xor bx, bx
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     mov si, offset board
 
     push si ;save offset of board
@@ -443,10 +429,7 @@ spawn_tile PROC ; КТ-4
 
     push ax ;save ax
     inc bx
-    or ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     pop ax ;restpre ax
     for_count02:
         cmp [si], byte ptr 0
@@ -516,10 +499,7 @@ check_game_over PROC ; КТ-5
     pop curr_score
 
     mov si, offset board
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     find0:
         cmp [si], byte ptr 0
         je notover ;if([si]==0) -> notover
@@ -547,10 +527,7 @@ check_win PROC ; КТ-5
     je end_check2024
 
     mov si, offset board
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     for_check2024:
         cmp [si], byte ptr 11 ;11-це 2048
         je have2024
@@ -579,10 +556,7 @@ copy_boards PROC
     mov di, [bp+6] ;to this board
     mov si, [bp+4] ;form this board
 
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     for_copy:
         mov al, [si]
         mov [di], al
@@ -608,10 +582,7 @@ compare_boards PROC
     mov di, [bp+6] ;fir
     mov si, [bp+4] ;sec
 
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     for_compare:
         mov al, [si]
         cmp [di], al
@@ -653,10 +624,7 @@ reset_gamelog PROC
     mov si, offset board
     mov di, offset prevboard
 
-    xor ax, ax
-    mov al, board_type
-    mul board_type
-    mov cx, ax ;cx=board_type*board_type
+    mov cx, board_type*board_type ;cx=board_type*board_type
     for_reset:
         mov [si], byte ptr 0
         mov [di], byte ptr 0

@@ -7,7 +7,7 @@ locals @@
     board       DB 25 DUP(0) ;Підхід B: Зберігати показник степеня
     saveboard   DB 25 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
     prevboard   DB 25 DUP(0)
-    board_type  DB 4
+    board_type  EQU 4
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
     tile_colors DB 00h  ; чорний            пуста клітинка
