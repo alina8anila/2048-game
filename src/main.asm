@@ -128,6 +128,7 @@ jmp main_loop
     
     @restart_game:
     call reset_gamelog
+    jmp start
 
     @continue_game:
     mov game_phase, 0
