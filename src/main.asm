@@ -7,8 +7,8 @@ locals @@
     board       DB 25 DUP(0) ;Підхід B: Зберігати показник степеня
     saveboard   DB 25 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
     prevboard   DB 25 DUP(0)
-    prevscore   DB 0         ;для ctrZ
-    prevbscore  DB 0         ;для ctrZ
+    prevscore   DW 0         ;для ctrZ
+    prevbscore  DW 0         ;для ctrZ
     board_type  EQU 4
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
