@@ -3,7 +3,7 @@
 ; ===========================================
 
 draw_board PROC ; КТ-4
-; намалювати ігрове поле (рамку)
+; draw game board (with frame and tiles)
     push bp
     mov bp, sp
     push di
@@ -12,7 +12,7 @@ draw_board PROC ; КТ-4
     push bx
     push cx
     
-    ; очищення екрану
+    ; screen cleaning
     xor di, di
     mov cx, 80 * 25
     mov ax, 0720h  
@@ -21,18 +21,18 @@ draw_board PROC ; КТ-4
     add di, 2
     loop @cls
 
-    ; вивести рамку
-    ; з draw_tile: row = start_row + (tile_height + 1) * grid_row,   column = start_col + (tile_width + 1) * grid_column 
-    ; Верхня границя рамки: (start_row - 1, start_col - 1) - кут
-    ; Нижня границя рамки: (start_row - 1 + 4*(TILE_HEIGHT+1), start_col - 1 + 4*(TILE_WIDTH+1))
+    ; print frame
+    ; from draw_tile: row = start_row + (tile_height + 1) * grid_row,   column = start_col + (tile_width + 1) * grid_column 
+    ; Upper frame border: (start_row - 1, start_col - 1) - кут
+    ; Lower frame border: (start_row - 1 + 4*(TILE_HEIGHT+1), start_col - 1 + 4*(TILE_WIDTH+1))
 
-    ; зовнішня рамка
+    ; Outer frame:
     ; ASCII: ║ 186, ═ 205, ╟ 199, ╢ 182, ╧ 207, ╤ 209, ╔ 201, ╗ 187, ╚ 200, ╝ 188
-    ; внутрішня рамка 
+    ; Inner frame: 
     ; ASCII: │ 179, ─ 196, ┼ 197
 
-    ; ------- горизонтальні лінії -------
-    ; скільки стовпців треба пройти (без кутових)
+    ; ------- Horizontal lines -------
+    ; How many columns need to be passed (without corner ones)
     mov ax, TILE_WIDTH
     inc ax
     mov bx, board_type
@@ -66,7 +66,7 @@ draw_board PROC ; КТ-4
     xor dx, dx
     mov dl, TILE_WIDTH
     inc dl
-    div dl  ; ah - остача
+    div dl  ; ah - remainder
     cmp ah, TILE_WIDTH
     je @on_hor_boundary
 
@@ -79,8 +79,8 @@ draw_board PROC ; КТ-4
     inc dl
     mul dl 
     shl ax, 1
-    mov dx, ax  ; offset по рядкам
-    add di, dx  ; перейти до наступного горизонтального рядка
+    mov dx, ax  ; offset by rows
+    add di, dx  ; move to the next horizontal line
     
     mov cx, board_type
     dec cx
@@ -108,7 +108,7 @@ draw_board PROC ; КТ-4
     mul dl
     shl ax, 1
     mov dx, ax
-    add di, dx  ; перейти до наступного горизонтального рядка
+    add di, dx  ; move to the next horizontal line
     
     mov cx, board_type
     dec cx
@@ -132,8 +132,8 @@ draw_board PROC ; КТ-4
     pop cx
     loop horizontal
 
-    ; ------- вертикальні лінії -------
-    ; скільки рядків треба пройти (без кутових)
+    ; ------- Vertical lines -------
+    ; How many rows need to be passed (without corner ones)
     mov ax, TILE_HEIGHT
     inc ax
     mov bx, board_type
@@ -167,7 +167,7 @@ draw_board PROC ; КТ-4
     xor dx, dx
     mov dl, TILE_HEIGHT
     inc dl
-    div dl  ; ah - остача
+    div dl  ; ah - remainder
     cmp ah, TILE_HEIGHT
     je @on_vert_boundary
 
@@ -177,8 +177,8 @@ draw_board PROC ; КТ-4
 
     mov dx, TILE_WIDTH
     inc dx      
-    shl dx, 1   ; offset по стовпцям
-    add di, dx  ; перейти до наступної вертикалі 
+    shl dx, 1   ; offset by columns
+    add di, dx  ; move to the next vertical line
     
     mov cx, BOARD_TYPE
     dec cx
@@ -206,7 +206,7 @@ draw_board PROC ; КТ-4
     mul dx
     shl ax, 1
     mov dx, ax
-    add di, dx  ; перейти до найправішої вертикалі
+    add di, dx  ; move to the last vertical line
 
     mov ah, 0Fh
     mov al, 182     ; ╢ 182
@@ -220,7 +220,7 @@ draw_board PROC ; КТ-4
     pop cx
     loop vertical
 
-    ; ------- кути -------
+    ; ------- Corners -------
     call find_start_row
     dec dx
     mov ax, dx
@@ -242,7 +242,7 @@ draw_board PROC ; КТ-4
     mov bx, board_type
     mul bx
     shl ax, 1
-    mov cx, ax  ; крок крайніми стовпцями рамки
+    mov cx, ax  ; move to the last vertical line
     add di, cx
     
     mov ah, 0Fh
@@ -303,7 +303,7 @@ print_help_texts PROC
     push di
     push cx
 
-    ; заповнити нижній рядок блакитним кольором для msg
+    ; fill the line with blue colour for msg
     mov di, 24*80
     shl di, 1
     mov cx, 80
@@ -314,8 +314,8 @@ print_help_texts PROC
     add di, 2
     loop @fill_loop
 
-    ; очистити рядок для hint
-    mov di, 22*80
+    ; clean line for hint
+    mov di, 23*80
     shl di, 1
     mov cx, 80
     @clean_loop:
@@ -354,7 +354,7 @@ print_help_texts PROC
     call print_line
     add sp, 8
 
-    ; HINT
+    ; hint
     xor ax, ax
     mov al, game_phase
     shl ax, 1
@@ -390,7 +390,7 @@ print_help_texts PROC
     ret
 print_help_texts ENDP
 print_line PROC
-; вивести null-terminated рядок тексту за позицією
+; print null-terminated text line by position
     push bp
     mov bp, sp
     push ax
@@ -399,16 +399,16 @@ print_line PROC
     push si
 
     ; [bp+10] - color attribute, [bp+8] - row, [bp+6] - column, [bp+4] - offset
-    ; DI = (row * 80 + column) * 2
+    ; di = (row * 80 + column) * 2
     mov ax, [bp+8]
     mov bx, 80
     mul bx
     add ax, [bp+6]
     shl ax, 1
     mov di, ax
-    ; SI - offset
+    ; si - offset
     mov si, [bp+4]
-    ; AH - color attribute
+    ; ah - color attribute
     mov ah, byte ptr [bp+10]
 
     @print_loop:
@@ -435,7 +435,7 @@ find_start_row PROC
     push bx
     push cx
     ; start_row = (25 - (board_type * (TILE_HEIGHT + 1) - 1)) / 2
-    ; повернути в dx
+    ; return value to dx
 
     mov cx, 25
     mov ax, TILE_HEIGHT
@@ -461,7 +461,7 @@ find_start_col PROC
     push bx
     push cx
     ; start_col = (80 - (board_type * (TILE_WIDTH + 1) - 1)) / 2
-    ; повернути в dx
+    ; return value to dx
 
     mov cx, 80
     mov ax, TILE_WIDTH
@@ -481,7 +481,7 @@ find_start_col PROC
 find_start_col ENDP
 
 draw_tile PROC ; КТ-3
-; намалювати одну клітинку з її значенням
+; draw a tile with its value
     push bp
     mov bp, sp
     push ax
@@ -492,20 +492,20 @@ draw_tile PROC ; КТ-3
     push dx
 
     ; [bp+6] - grid_row, [bp+4] - grid_column
-    ; обчислити index для взяття значення: row*board_type+column
+    ; calculate the index to take the value: row*board_type+column
     mov ax, [bp+6]
     mov bx, board_type
     mul bx
     add ax, [bp+4]
     mov di, ax    
-        ; зберігаємо index
+        ; save index
         mov cx, di
     mov al, board[di]
     xor ah, ah   
     mov si, ax     ; si - power of 2
 
     ; row = start_row + (tile_height+1) * grid_row,   column = start_col + (tile_width+1) * grid_column 
-    ; з відступами від країв та місцями для рамки МІЖ клітинками
+    ; with spaces between edges and for frame borders between tiles
     mov ax, [bp+4]
     mov di, TILE_WIDTH
     inc di
@@ -521,12 +521,12 @@ draw_tile PROC ; КТ-3
     call find_start_row ; dx = start_row   
     add ax, dx      ; ax - row
 
-        ; зберегти колонку, рядок та index
+        ; save column, row and index
         push bx
         push ax
         push cx
 
-    ; намалювати прямокутник
+    ; draw a rectangle
     mov cx, TILE_HEIGHT
     @row_loop:
     push cx
@@ -540,8 +540,8 @@ draw_tile PROC ; КТ-3
     shl ax, 1
     mov di, ax
         @col_loop:
-        mov ah, tile_colors[si] ; колір
-        mov al, 219             ; символ
+        mov ah, tile_colors[si] ; colour
+        mov al, 219             ; symbol
         mov es:[di], ax
 
         add di, 2
@@ -552,35 +552,35 @@ draw_tile PROC ; КТ-3
     pop cx
     loop @row_loop
 
-        ; повернути збережений index
+        ; return saved index
         pop di
     xor cx, cx
     mov cl, board[di]
     cmp cx, 0
     jne @continue
-    add sp, 4       ; прибрати зайві значення ax та bx
+    add sp, 4       ; delete saved row and column from stack
     jmp @done_drawing
     @continue:
     mov bx, 1
-    shl bx, cl         ; множення на 2 (піднесення в степінь)
+    shl bx, cl         ; multiply by 2 cl times (raise to a power of cl)
 
     ; padding_row = (TILE_HEIGHT - 1) / 2
     mov ax, TILE_HEIGHT
     dec ax
     shr ax, 1
     mov cx, ax ; cx = padding_row
-        pop ax ; повернути рядок
+        pop ax ; return saved row
     add ax, cx
 
-    push bx             ; значення плитки
-    call num_to_str     ; рядок у buffer, довжина у cx
+    push bx             ; tile value
+    call num_to_str     ; line in a buffer, length in cx
     add sp, 2
     ; padding_col = (TILE_WIDTH - string_length) / 2
     mov bx, TILE_WIDTH
     sub bx, cx
     shr bx, 1
     mov cx, bx ; cx = padding_col
-        pop bx ; повернути стовпець
+        pop bx ; return saved column
     add bx, cx
 
     xor dx, dx
@@ -604,22 +604,8 @@ draw_tile PROC ; КТ-3
     ret
     draw_tile ENDP
 
-animate_tile PROC ; КТ-5-6
-; зробити покадрову анімацію зсуву клітинки
-    push bp
-    mov bp, sp
-
-    ; стерти стару позицію
-    ; намалювати нову зсунуту позицію
-    ; зробити маленьку затримку
-    ; повторити 
-
-    pop bp
-    ret
-    animate_tile ENDP
-
 num_to_str PROC ; КТ-3
-; відображення числа в рядок та знаходження довжини
+; dispplay number into a string and find its length
     push bp
     mov bp, sp
     push ax
@@ -627,8 +613,8 @@ num_to_str PROC ; КТ-3
     push dx
     push di
 
-    ; повернути рядок в buffer, довжину в cx
-    ; [bp+4] - значення плитки
+    ; return line in buffer, length in cx
+    ; [bp+4] - tile value
     mov ax, [bp+4]
     xor cx, cx
     mov bx, 10
@@ -637,13 +623,13 @@ num_to_str PROC ; КТ-3
 
     convert:
     xor dx, dx
-    div bx          ; ax - частка, dx - остача
+    div bx          ; ax - quotient, dx - remainder
     push dx
     inc cx
     cmp ax, 0
     jne convert
 
-    mov bx, cx      ; зберігти довжину
+    mov bx, cx      ; save length
 
     write:
     pop dx
@@ -653,7 +639,7 @@ num_to_str PROC ; КТ-3
     loop write
     mov byte ptr [di], '$'
 
-    mov cx, bx      ; повертаємо довжину
+    mov cx, bx      ; return saved length
 
     pop di
     pop dx
@@ -664,7 +650,7 @@ num_to_str PROC ; КТ-3
     num_to_str ENDP
 
 draw_score PROC ; КТ-4
-; вивести поточний і найкращий рахунок (порівняння best та current)
+; print current and best scores
     push bp
     mov bp, sp
     push ax
@@ -672,7 +658,7 @@ draw_score PROC ; КТ-4
     push cx
     push di
 
-    ; заповнити рядок синім кольором
+    ; fill the line with blue colour
     xor di, di
     @next:
     mov ah, 01h
@@ -684,7 +670,7 @@ draw_score PROC ; КТ-4
     jmp @next
 
     @done_filling:
-    ; оновлення curr_score
+    ; update curr_score
     mov ax, curr_score
     push ax
     call num_to_str
@@ -704,7 +690,7 @@ draw_score PROC ; КТ-4
     call print_line
     add sp, 8
 
-    ; оновлення best_score
+    ; update best_score
     mov ax, best_score
     push ax
     call num_to_str
@@ -738,7 +724,7 @@ draw_score PROC ; КТ-4
     draw_score ENDP
 
 draw_game_over PROC ; КТ-5
-; вивід повідомлення GAME OVER
+; print GAME OVER
     push bp
     mov bp, sp
     push ax
@@ -746,13 +732,13 @@ draw_game_over PROC ; КТ-5
     push cx
     push di
 
-    ; стала позиція
-    ; вікно 23x7
+    ; permanent position
+    ; window 23x7
     ; row=(25-7)/2=9, column=(80-21)/2=28
     
-    ; рамка
+    ; frame:
     ; ASCII: ║ 186, ═ 205, ╔ 201, ╗ 187, ╚ 200, ╝ 188
-    ; ------- горизонтальні лінії -------
+    ; ------- Horizontal lines -------
     mov ax, 9
     mov bx, 29
     mov dx, 80
@@ -761,7 +747,7 @@ draw_game_over PROC ; КТ-5
     shl ax, 1
     mov di, ax
 
-    mov cx, 21  ; 23-2=21 через кути
+    mov cx, 21  ; 23-2=21 because of corners
     @hor:
     push di
     mov ah, 4Eh
@@ -773,7 +759,7 @@ draw_game_over PROC ; КТ-5
     add di, 2
     loop @hor
 
-    ; ------- вертикальні лінії -------
+    ; ------- Vertical lines -------
     mov ax, 10
     mov bx, 28
     mov dx, 80
@@ -782,7 +768,7 @@ draw_game_over PROC ; КТ-5
     shl ax, 1
     mov di, ax
 
-    mov cx, 5   ; 7-2=5 через кути
+    mov cx, 5   ; 7-2=5 because of corners
     @vert:
     push di
     mov ah, 4Eh
@@ -794,7 +780,7 @@ draw_game_over PROC ; КТ-5
     add di, 160
     loop @vert
 
-    ; ------- кути -------
+    ; ------- Corners -------
     mov ax, 9
     mov bx, 28
     mov dx, 80
@@ -827,12 +813,12 @@ draw_game_over PROC ; КТ-5
     mov al, 188 ; ╝ 188
     mov es:[di], ax
 
-    ; вікно
+    ; window
     mov ax, 9
     inc ax
     mov bx, 28
     inc bx
-    mov cx, 5   ; 7-2=5 через рамку
+    mov cx, 5   ; 7-2=5 because of frame
     @rows:
     push cx
     push bx
@@ -842,7 +828,7 @@ draw_game_over PROC ; КТ-5
     add ax, bx
     shl ax, 1
     mov di, ax
-    mov cx, 21  ; 23-2=21 через рамку
+    mov cx, 21  ; 23-2=21 because of frame
         @columns:
         mov ah, 04h
         mov al, 219
@@ -901,7 +887,7 @@ draw_game_over PROC ; КТ-5
     draw_game_over ENDP
 
 draw_win PROC ; КТ-5
-; вивід повідомлення WIN
+; print WIN
         push bp
     mov bp, sp
     push ax
@@ -909,13 +895,13 @@ draw_win PROC ; КТ-5
     push cx
     push di
 
-    ; стала позиція
-    ; вікно 23x7
+    ; permanent position
+    ; window 23x7
     ; row=(25-7)/2=9, column=(80-21)/2=28
     
     ; рамка
     ; ASCII: ║ 186, ═ 205, ╔ 201, ╗ 187, ╚ 200, ╝ 188
-    ; ------- горизонтальні лінії -------
+    ; ------- Horizontal lines -------
     mov ax, 9
     mov bx, 29
     mov dx, 80
@@ -924,7 +910,7 @@ draw_win PROC ; КТ-5
     shl ax, 1
     mov di, ax
 
-    mov cx, 21  ; 23-2=21 через кути
+    mov cx, 21  ; 23-2=21 because of corners
     @@hor:
     push di
     mov ah, 2Eh
@@ -936,7 +922,7 @@ draw_win PROC ; КТ-5
     add di, 2
     loop @@hor
 
-    ; ------- вертикальні лінії -------
+    ; ------- Vertical lines -------
     mov ax, 10
     mov bx, 28
     mov dx, 80
@@ -945,7 +931,7 @@ draw_win PROC ; КТ-5
     shl ax, 1
     mov di, ax
 
-    mov cx, 5   ; 7-2=5 через кути
+    mov cx, 5   ; 7-2=5 because of corners
     @@vert:
     push di
     mov ah, 2Eh
@@ -957,7 +943,7 @@ draw_win PROC ; КТ-5
     add di, 160
     loop @@vert
 
-    ; ------- кути -------
+    ; ------- Corners -------
     mov ax, 9
     mov bx, 28
     mov dx, 80
@@ -995,7 +981,7 @@ draw_win PROC ; КТ-5
     inc ax
     mov bx, 28
     inc bx
-    mov cx, 5   ; 7-2=5 через рамку
+    mov cx, 5   ; 7-2=5 because of frame
     @@rows:
     push cx
     push bx
@@ -1005,7 +991,7 @@ draw_win PROC ; КТ-5
     add ax, bx
     shl ax, 1
     mov di, ax
-    mov cx, 21  ; 23-2=21 через рамку
+    mov cx, 21  ; 23-2=21 because of frame
         @@columns:
         mov ah, 02h
         mov al, 219
