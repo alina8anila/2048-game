@@ -3,9 +3,9 @@
 locals @@
 
 .DATA
-    row         DB 0,0,0,0,0   ;для релізації ігрової логіки (процедур зсування)
-    board       DB 25 DUP(0) ;Підхід B: Зберігати показник степеня
-    saveboard   DB 25 DUP(0) ;для check_game_over, щоб не змінювати оригінальну дошку
+    row         DB 0,0,0,0,0   ; for the implementation of game logic (sliding procedures)
+    board       DB 25 DUP(0) ; approach B: save the exponent
+    saveboard   DB 25 DUP(0) ; for check_game_over to not change the original board
     prevboard   DB 25 DUP(0)
     Zboard      DB 25 DUP(0) ;для ctrZ
     prevscore   DW 0         ;для ctrZ
@@ -13,19 +13,19 @@ locals @@
     board_type  EQU 4
     TILE_WIDTH  EQU 7
     TILE_HEIGHT EQU 3
-    tile_colors DB 00h  ; чорний            пуста клітинка
-                DB 08h  ; темно-сірий       2¹=2
-                DB 07h  ; світло-сірий      2²=4
-                DB 06h  ; коричневий
-                DB 0Eh  ; жовтий
-                DB 0Ch  ; яскраво-червоний
-                DB 04h  ; червоний
-                DB 05h  ; пурпуровий
-                DB 09h  ; яскраво-синій
-                DB 03h  ; блакитний
-                DB 02h  ; зелений
-                DB 0Ah  ; яскраво-зелений   2¹¹=2048
-    buffer      DB 8 DUP(0)       ; для збереження рядка
+    tile_colors DB 00h  ; black             empty tile
+                DB 08h  ; dark grey         2¹=2
+                DB 07h  ; light grey        2²=4
+                DB 06h  ; brown
+                DB 0Eh  ; yellow
+                DB 0Ch  ; bright red
+                DB 04h  ; red
+                DB 05h  ; purple
+                DB 09h  ; bright blue
+                DB 03h  ; blue
+                DB 02h  ; green
+                DB 0Ah  ; bt=right green    2¹¹=2048
+    buffer      DB 8 DUP(0)       ; for saving string
     game_title  DB "2 0 4 8$"
     TITLE_LEN   EQU $-game_title
     g_over      DB "G A M E   O V E R$"
@@ -36,20 +36,20 @@ locals @@
     HINT_1_LEN  EQU $-hint_1
     hint_2      DB "Press R to restart or ESC to quit$"
     HINT_2_LEN  EQU $-hint_2
-    hint_table  DW offset hint_0, offset hint_1, offset hint_2 ; таблиця повідомлень з підказками щодо клавіш
+    hint_table  DW offset hint_0, offset hint_1, offset hint_2 ; comment table with hints
     HINT_LENS   DW offset HINT_0_LEN, offset HINT_1_LEN, offset HINT_2_LEN
     msg_0       DB "Join equal numbers and get to the 2048 tile!$"
     msg_1       DB "You've reached 2048!$"
     msg_2       DB "No more moves!$"
-    msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; таблиця коментарів для нижньої лінії
-    curr_score  DW 0    ; current score
+    msg_table   DW offset msg_0, offset msg_1, offset msg_2 ; comment table for bottom line
+    curr_score  DW 0        ; current score
     curr_msg    DB "Current score: $"
     CURR_LEN    EQU $-curr_msg-1
-    best_score  DW 0    ; best score 
+    best_score  DW 0        ; best score 
     best_msg    DB "Best score: $"    
     BEST_LEN    EQU $-best_msg-1
-    game_phase  DB 0         ;0-game is going, 1-win, 2-lose
-    win_triger  DB 0         ;для продовження гри після досягнення 2024
+    game_phase  DB 0         ; 0-game is going, 1-win, 2-lose
+    win_triger  DB 0         ; to continue playing after reaching 2048
 .CODE
 start:
     mov ax, @data
@@ -72,7 +72,7 @@ start:
     jmp main_loop
 
 main_loop:
-    ; перевірка стану гри
+    ; check game_phase
     call check_win
     cmp game_phase, 1
     je win_loop
@@ -82,7 +82,7 @@ main_loop:
     je over_loop
 
     mov ah, 00h
-    int 16h     ; чекати на клавішу
+    int 16h     ; waiting for key
 
     cmp ah, 48h
     je move_up
