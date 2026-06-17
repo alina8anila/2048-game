@@ -3,6 +3,7 @@
 
 # Назва проєкту
 Тема: [Y05](https://github.com/ukma-fin-csa-2026/projects/issues/13)
+![](screenshot.png)
 
 ## Launch Instructions
 
