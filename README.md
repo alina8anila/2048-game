@@ -2,9 +2,64 @@
 [![Open in Codespaces](https://classroom.github.com/assets/launch-codespace-2972f46106e565e64193e422d61a12cf1da4916b45550586e14ef0a7c637dd04.svg)](https://classroom.github.com/open-in-codespaces?assignment_repo_id=22911917)
 
 # Назва проєкту
-
 Тема: [Y05](https://github.com/ukma-fin-csa-2026/projects/issues/13)
 
+## Launch Instructions
+
+### 1. Prepare DOSBox
+
+**Windows:** Make sure you have DOSBox installed.  
+**macOS:** Make sure you have DOSBox installed.
+
+### 2. Mount the repository in DOSBox
+
+Open the DOSBox configuration file (`dosbox.conf`).
+
+Find the `[autoexec]` section and add:
+
+```
+mount d "C:\YOUR_FOLDER\REPO_FOLDER"
+```
+
+Or on macOS:
+
+```
+mount d "~/REPO_FOLDER"
+```
+
+Save the file.
+
+> The path to the repository must not contain Cyrillic characters, otherwise DOSBox/TASM may not work correctly.
+
+### 3. Run DOSBox
+
+**Windows:**
+```
+C:\DosBox\START-DOSBOX.bat
+```
+
+**macOS:**
+```
+zsh ~/DosBox/start-dosbox.sh
+```
+
+After launching, navigate to the source code folder:
+
+```
+d:
+е
+dir
+```
+
+### 4. Build and run the game
+
+In `src` execute:
+
+```
+tasm /zi main.asm
+tlink /v main.obj
+main.exe
+```
 ## Команда
 
 - Паращій Аліна — a.parashchii@ukma.edu.ua
@@ -48,6 +103,7 @@
 Якщо гравець переміг, то він так само може перезапустити гру або вийти з неї, а також продовжити гру далі без перезапуску (C).
 Якщо гравець програв, то він може тільки перезапустити гру або вийти з неї.
 При перезапуску гри, найкращий рахунок зберігається та оновлюється, якщо в якийсь момент поточний рахунок перевищив найкращий.
+
 
 ### Аналіз підходів (A проти Б)
 1. **Значення плиток зберігаються як фактичні числа проти як показники степеня (степені двійки)**
